@@ -1,0 +1,44 @@
+[
+    {
+        "button"  : "a",
+        "onTime"  : 100,
+        "offTime" : 600,
+        "count"   : 1
+    },
+    {
+        "button"  : "left",
+        "onTime"  : 100,
+        "offTime" : 200,
+        "count"   : 5
+    },
+    {
+        "button"  : "up",
+        "onTime"  : 100,
+        "offTime" : 200,
+        "count"   : 1
+    },
+    {
+        "button"  : "right",
+        "onTime"  : 100,
+        "offTime" : 200,
+        "count"   : 1
+    },
+    {
+        "button"  : "up",
+        "onTime"  : 100,
+        "offTime" : 200,
+        "count"   : 1
+    },
+    {
+        "button"  : "right",
+        "onTime"  : 100,
+        "offTime" : 200,
+        "count"   : 4
+    },
+    {
+        "button"  : "a",
+        "onTime"  : 100,
+        "offTime" : 200,
+        "count"   : 1
+    }
+]
