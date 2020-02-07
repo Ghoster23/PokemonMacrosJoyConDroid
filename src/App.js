@@ -574,12 +574,15 @@ class App extends Component {
 		const macros = this.macros.map((macro, index) => {
 			var selected = this.selectedMacro === index;
 			var style = (selected ? {background : "black", color : "white"} : {background : "white", color : "black"});
+			var images = ["./images/timeskip_icon.png", "./images/timeskip_icon.png"];
 
 			return (
 				<div className = "Macro">
-					<button key = {index} className = "MacroButton" id = {macro.name} style = {style} onClick = {e => this.setMacro(index)}>
+					<div key = {index} className = "MacroButton" id = {macro.name}
+						style = {style} onClick = {e => this.setMacro(index)}>
+						<img className = "Icon" src = {images[index]} alt = {"Icon" + macro.name}/>
 						{macro.name}
-					</button>
+					</div>
 					<ParameterInput key = "paramInput"
 						active = {selected} locked = {this.state.locked}
 						macro = {index}
@@ -592,7 +595,9 @@ class App extends Component {
 		return (
 			<div className = "App">
 				<div className = "App-header">
-					{this.state.selectedMacro + " " + this.state.macroState}
+					<img className = "Icon" src = "./images/macro_app_icon.png" alt = "AppIcon"/>
+					<text className = "App-title"
+						style = {{fontWeight: "bold", color: "black"}}> POKÉMACROS </text>
 				</div>
 				<div id = "body">
 					<div id = "Macros">
@@ -630,6 +635,13 @@ class App extends Component {
 							Pause
 						</button>
 					</div>
+					<button key = "testA" className = "MacroButton" id = "testA"
+						onMouseDown  = {e => this.handleSwitchKeys("a", true)}
+						onMouseUp    = {e => this.handleSwitchKeys("a", false)}
+						onTouchStart = {e => this.handleSwitchKeys("a", true)}
+						onTouchEnd   = {e => this.handleSwitchKeys("a", false)}>
+						A
+					</button>
 				</div>
 			</div>
 		);

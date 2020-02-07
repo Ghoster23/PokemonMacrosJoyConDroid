@@ -1,33 +1,30 @@
 html, body {
   height: 100vh;
   overflow: hidden;
-  background-color: #FFFFFF;
 }
 
 .App {
   text-align: center;
   height: 100vh;
   width: 100vw;
-  background-color: #2d2f53;
   color: white;
-}
-
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+  background-image: url("/images/background.png");
+  background-repeat: no-repeat;
+  background-size: 100vw 100vh;
 }
 
 .App-header {
-  background-color: #000000;
-  text-align: center;
-  height: 5vh;
-  padding: 5vw;
-  color: white;
-  font-size: 5vh;
+  width: 100vw;
+  height: 10vh;
+  font-size: 6vh;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-around;
 }
 
-.App-intro {
-  font-size: large;
+.App-title {
+  padding: 1vw 1vh;
 }
 
 #body {
@@ -65,13 +62,18 @@ html, body {
     color: black;
     width: 8.4vh;
     height: 8.4vh;
-    padding: 5vw;
     text-align: center;
     text-decoration: none;
     font-size: 20px;
     margin: auto;
     border-radius: 50%;
     flex-shrink: 0;
+    box-shadow: 0px 0.6vh 1.2vh -0.4vh #2a2a2a;
+}
+
+.Icon {
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .MacroParameters {
@@ -82,7 +84,7 @@ html, body {
     width: 65vw;
     background: #3b3e7a;
     margin: auto;
-    border-radius: 5vw;
+    border-radius: 10vw;
 }
 
 .Parameter {
@@ -103,7 +105,7 @@ html, body {
 }
 
 .filler {
-    background: #1DA598;
+    background: #241d92;
     height: 100%;
     border-radius: inherit;
     transition: width .2s ease-in;
