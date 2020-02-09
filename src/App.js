@@ -8,8 +8,28 @@ const MacroStates = {
 	FINISHED: 3
 }
 
+function arrayFindIndex(array, toFind) {
+	var found = -1;
+
+	array.forEach((item, i) => {
+		if(item === toFind) found = i;
+	});
+
+	return found;
+}
+
 function ConvertDate(date) {
 	return date.toISOString().slice(0,10);
+}
+
+function LoadJson(path) {
+	var res = null;
+
+	fetch(path)
+		.then(response => response.json())
+		.then(json => res = json);
+
+	return res;
 }
 
 // React Components
@@ -23,6 +43,17 @@ function ProgressBar(props) {
 	);
 }
 
+function KeyLog(props) {
+	return (
+		<div key = {props.ind} className = "key-log">
+			<b> {props.pressedKey} </b>
+			<b> {props.onTime} </b>
+			<b> {props.offTime} </b>
+		</div>
+	);
+}
+
+/*
 class CheckBox extends React.Component {
 	constructor(props) {
 		super(props);
@@ -41,6 +72,7 @@ class CheckBox extends React.Component {
 		);
 	}
 }
+*/
 
 class DateInput extends React.Component {
 	constructor(props) {
@@ -96,14 +128,14 @@ class ParameterInput extends React.Component {
 
 			case 0:
 				macro = (
-					<div className = "MacroParameters" id = "TimeSkipParams">
-						<label className = "Parameter">
+					<div className = "macro-parameters" id = "TimeSkipParams">
+						<label className = "parameter">
 							Start Date
 							<DateInput id = "startDate" name = "start-date"
 								date = {this.props.startDate} onChange = {this.handleSDChange}
 								readonly = {readonly}/>
 						</label>
-						<label className = "Parameter">
+						<label className = "parameter">
 							End Date
 							<DateInput id = "endDate" name = "end-date"
 								date = {this.props.endDate} onChange = {this.handleEDChange}
@@ -115,12 +147,14 @@ class ParameterInput extends React.Component {
 
 			case 1:
 				return (
-					<input type = "checkbox" checked = {this.props.checked} onChange = {this.handleChange} />
+					<div className = "macro-parameters" id = "TimeSkipParams">
+					</div>
 				);
 
 			case 2:
 				return (
-					<input type = "checkbox" checked = {this.props.checked} onChange = {this.handleChange} />
+					<div className = "macro-parameters" id = "TimeSkipParams">
+					</div>
 				);
 		}
 
@@ -139,11 +173,388 @@ function coroutine(f, args) {
 	}
 }
 
-function BuildTimeSkipMacro(startDate, days) {
+class TimeSkipMacroBuilder {
+	constructor() {
+		this.filename = {
+			FstSkipD  = "FirstDaySkip.json",
+			FstSkipM  = "FirstDayMonthSkip.json",
+			FstSkipY  = "FirstDayMonthYearSkip.json",
+			AdvDay    = "AdvanceDay.json",
+			AdvMonth  = "AdvanceMonth.json",
+			AdvYear   = "AdvanceYear.json",
+			AdvDec    = "AdvanceDecember.json",
+			AdvYear   = "AdvanceYear.json",
+			AdvYearLp = "AdvanceYearLeap.json"
+		}
+
+		this.loaded = {
+			FstSkipD  = "",
+			FstSkipM  = "",
+			FstSkipY  = "",
+			AdvDay    = "",
+			AdvMonth  = "",
+			AdvYear   = "",
+			AdvDec    = "",
+			AdvYear   = "",
+			AdvYearLp = ""
+		}
+
+		this.daysInMonth = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+	}
+
+	isLeapYear(year) {
+		if(year % 4 === 0) {
+			if(year % 100 !== 0 || year % 400 === 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	determineFirstSegments(firstDay, secondDay) {
+		segments = [];
+
+		if(firstDay.getMonth() < secondDay.getMonth()) {
+			if(firstDay.getFullYear() < secondDay.getFullYear()) {
+				segments.push(getMacro("FstSkipY"));
+			}
+			else {
+				segments.push(getMacro("FstSkipM"));
+			}
+		}
+		else {
+			segments.push(getMacro("FstSkipD"));
+		}
+
+		return segments;
+	}
+
+	AdvanceDay(days = 1) {
+		macro = getMacro("AdvDay");
+
+		macro.count = days;
+
+		return macro;
+	}
+
+	AdvanceMonth(days = 31) {
+		macro = getMacro("AdvMonth");
+
+		macro.count = days;
+
+		return macro;
+	}
+
+	build(sd, ed) {
+		var segments = [];
+
+		var startDate = new Date(sd);
+		var endDate   = new Date(ed);
+
+		var eYear  = endDate.getFullYear();
+		var eMonth = endDate.getMonth();
+		var eDay   = endDate.getDate();
+
+		var currentDate = new Date(sd);
+		currentDate.setDate(currentDate.getDate() + 1);
+
+		segments.concat(determineFirstSkip(startDate, currentDate));
+
+		// While end Date has not been reached
+		while(currentDate < endDate) {
+			var macro = "";
+
+			var cYear  = currentDate.getFullYear();
+			var cMonth = currentDate.getMonth();
+			var cDay   = currentDate.getDate();
+
+			// If Target Year has been reached
+			if(cYear === eYear) {
+				// If Target Month has been reached
+				if(cMonth === eMonth) {
+					var daysToGo = eDay - cDay;
+
+					segments.push(AdvanceDay(daysToGo));
+					currentDate.setDate(currentDate.getDate() + daysToGo);
+				}
+
+				// Not at Target Month
+				else {
+					var i = cMonth;
+					for(; i < eMonth; i++) {
+						var daysToGo = this.daysInMonth[i];
+						segments.push(AdvanceMonth(daysToGo));
+						currentDate.setDate(currentDate.getDate() + daysToGo);
+					}
+				}
+			}
+
+			// Not at Target Year
+			else {
+				// If it's January
+				if(cMonth === 0) {
+					// If it's a Leap Year
+					if(isLeapYear(cYear)) {
+						segments.push(getMacro("AdvYearLp"));
+						currentDate.setDate(currentDate.getDate() + 366);
+					}
+
+					// If Not
+					else {
+						segments.push(getMacro("AdvYear"));
+						currentDate.setDate(currentDate.getDate() + 365);
+					}
+				}
+
+				// If it's December
+				else if(cMonth === 11) {
+					segments.push(getMacro("AdvDec"));
+					currentDate.setDate(currentDate.getDate() + 31);
+				}
+
+				// Other Months
+				else {
+					var i = cMonth;
+					for(; i < 11; i++) {
+						var daysToGo = this.daysInMonth[i];
+
+						// If it's February and not a Leap Year
+						if(i === 1 && !isLeapYear(cYear)) {
+							daysToGo -= 1;
+						}
+
+						segments.push(AdvanceMonth(daysToGo));
+						currentDate.setDate(currentDate.getDate() + daysToGo);
+					}
+				}
+			}
+
+			// If it is the 1st of the Month
+			if(cDay === 1) {
+				// If it is January
+				if(cMonth === 0) {
+					// If end Date is not this Year
+					if(cYear < eDate.getFullYear()) {
+						macro = "AdvYear";
+						if(isLeapYear(cYear)) macro = "AdvYearLp";
+
+						segments.push(getMacro(macro));
+
+						currentDate.setFullYear(currentDate.getFullYear() + 1);
+					}
+				}
+
+				// If it is another Month
+				else {
+					var i = cMonth;
+					for(; i < 12; i++) {
+						segments.push(advanceMonth(i, cYear));
+					}
+				}
+			}
+		}
+	}
+
+	getMacro(key) {
+		var macro = this.loaded[key];
+
+		if(macro === "") {
+			macro = LoadJson("./macros/" + this.filename[key]);
+			this.loaded[key] = macro;
+		}
+
+		return macro;
+	}
+}
+
+function BuildTimeSkipMacro(startDate, endDate) {
 	var paths = [];
 	var reps  = [];
 
+	var pbs = { macro_folder : "./macros/", skipfirst : "SkipFirst",
+	advance : "Advance", day : "Day", month : "Month", year : "Year", json : ".json" }
 
+	var daysInMonth = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+	var sDate = new Date(startDate);
+	var eDate = new Date(endDate);
+
+	// First skip
+	paths[0] = pbs.macro_folder + pbs.skipfirst + pbs.day;
+
+	var sDate_p1 = new Date(startDate);
+	sDate_p1.setDate(sDate_p1.getDate() + 1);
+
+	if(sDate.getMonth() < sDate_p1.getMonth()) {
+		paths[0] += pbs.month;
+
+		if(sDate.getFullYear() < sDate_p1.getFullYear()) {
+			paths[0] += pbs.year;
+		}
+	}
+
+	paths[0] += pbs.json;
+	reps[0]   = 1;
+
+	// Suvsequent skips
+	var cDate = sDate_p1;
+	var index = 1;
+
+	while(cDate < eDate) {
+		paths[index] = pbs.macro_folder + pbs.advance + pbs.day;
+
+		var cYear  = cDate.getFullYear();
+		var cMonth = cDate.getMonth();
+		var cDay   = cDate.getDate();
+
+		// If we are in the target Year and Month
+		if(cYear === eDate.getFullYear() && cMonth === eDate.getMonth()) {
+			reps[index] = eDate.getDate() - cDay;
+		}
+		else {
+			var leap_year = true;
+
+			// If it's February check for Leap Year
+			if(cMonth === 2) {
+				leap_year = cYear % 4 === 0 && (cYear % 100 !== 0 || cYear % 400 === 0);
+			}
+
+			// Calculate # of days to the end of the Month
+			reps[index] = daysInMonth[cMonth] - (cDay - 1);
+			if(leap_year) reps[index] -= 1;
+
+			// Add that segment to the macro
+			paths[index] += pbs.json;
+			index++;
+
+			// Add skip for last day of the month to first of the next
+			paths[index] = pbs.macro_folder + pbs.advance + pbs.day + pbs.month;
+			reps[index]  = 1;
+
+			// If it is December signal year skip
+			if(cMonth === 11) {
+				paths[index] += pbs.year;
+			}
+		}
+
+		paths[index] += pbs.json; // Finish path to macro segment
+		cDate.setDate(cDay + reps[index - 1] + 1); // Advance date
+		index++;
+	}
+
+	console.log(paths);
+	console.log(reps);
+
+	return new Macro("Time Skip", paths, reps);
+}
+
+class KeyLogger {
+	constructor() {
+		this.log = [];
+		this.log_count = 0;
+
+		this.active = [];
+		this.active_count = 0;
+	}
+
+	clear() {
+		this.log = [];
+		this.log_count = 0;
+
+		this.active = [];
+		this.active_count = 0;
+	}
+
+	pressKey(key, time) {
+		var ind = arrayFindIndex(this.active, key);
+
+		// If key is not pressed
+		if(ind === -1) {
+			this.active[this.active_count] = key;
+			this.active_count++;
+
+			this.logKeyPress(key, time);
+		}
+	}
+
+	logKeyPress(key, time) {
+		this.log[this.log_count] = {key: key, onTime: time, offTime: ''};
+		this.log_count++;
+	}
+
+	releaseKey(key, time) {
+		if(this.active_count > 0) {
+			var ind = arrayFindIndex(this.active, key);
+
+			// If key is pressed
+			if(ind !== -1) {
+				this.active.splice(ind, 1);
+				this.active_count--;
+
+				this.logKeyRelease(key, time);
+			}
+		}
+	}
+
+	logKeyRelease(key, time) {
+		var i = 0;
+		for(; i < this.log_count; i++) {
+			var entry = this.log[this.log_count - (i + 1)];
+
+			if(entry.key === key && entry.offTime === '') {
+				entry.offTime = time;
+				this.log[i] = entry;
+				break;
+			}
+		}
+	}
+
+	update(key, pressed, time) {
+		// If key is being pressed
+		if(pressed) {
+			this.pressKey(key, time);
+		}
+		// If key is being released
+		else {
+			this.releaseKey(key, time);
+		}
+	}
+
+	renderPressed() {
+		var pressed = this.active.map((key, index) => {
+			return (
+				<div className = "pressedKey" key = {key}>
+					{key}
+				</div>
+			)
+		});
+
+		return (
+			<div id = "PressedKeys">
+				<b> Pressed </b>
+				{pressed}
+			</div>
+		);
+	}
+
+	renderLogged() {
+		var keyLogs = [];
+
+		if(this.log_count > 0) {
+			var i = 0;
+			for(; i < Math.min(3, this.log_count); i++) {
+				var l = this.log[this.log_count - (i + 1)];
+				keyLogs.push(<KeyLog key = {"keylog_" + i} pressedKey = {l.key} onTime = {l.onTime} offTime = {l.offTime}/>);
+			}
+		}
+
+		return (
+			<div id = "KeyLogs">
+				{keyLogs}
+			</div>
+		);
+	}
 }
 
 class Macro {
@@ -238,9 +649,11 @@ class Macro {
 							// Set timer for the duration of the button press
 							this.wait(Math.max(step.onTime, 20));
 
+							yield res;
+
 							// Wait
 							while(this.onWait) {
-								info = yield res;
+								info = yield;
 								if(info.abort) return;
 								this.state = info.state;
 							}
@@ -250,9 +663,11 @@ class Macro {
 							// Set timer for the wait before pressing the next button
 							this.wait(Math.max(step.offTime, 20));
 
+							yield res;
+
 							// Wait for timer to elapse and to not be paused
 							while(this.onWait || this.state === MacroStates.PAUSED) {
-								info = yield res;
+								info = yield;
 								if(info.abort) return;
 								this.state = info.state;
 							}
@@ -314,14 +729,18 @@ class App extends Component {
 		this.onEndDateChange = this.onEndDateChange.bind(this);
 
 		this.macros = [];
-		this.macros[0] = new Macro("Skip First Day", ["./macros/SkipFirstDay.json"], [1]);
-		this.macros[1] = new Macro("Skip First Day", ["./macros/SkipFirstDay.json"], [1]);
+
+		this.keyLogger = new KeyLogger();
+		this.currentTime = 0;
 
 		this.selectedMacro = 0;
 
 		var today = new Date();
 		var tomorrow = new Date();
 		tomorrow.setDate(tomorrow.getDate() + 1);
+
+		this.macros[0] = BuildTimeSkipMacro(today, tomorrow);
+		console.log(this.macros[0]);
 
 		this.state = {selectedMacro : this.selectedMacro,
 					  macroState : this.macros[this.selectedMacro].state,
@@ -344,6 +763,8 @@ class App extends Component {
 	}
 
 	update() {
+		this.currentTime += 20;
+
 		var currentMacro = this.macros[this.selectedMacro];
 
 		this.setState({selectedMacro : this.selectedMacro});
@@ -361,6 +782,7 @@ class App extends Component {
 		if(res !== undefined) {
 			if(res.value !== undefined) {
 				this.handleSwitchKeys(res.value.button, res.value.pressed);
+				this.keyLogger.update(res.value.button, res.value.pressed, this.currentTime);
 			}
 
 			if(res.done) currentMacro.state = MacroStates.FINISHED;
@@ -374,7 +796,6 @@ class App extends Component {
 
 		if(currentMacro.state !== MacroStates.INACTIVE) {
 			currentMacro.reset();
-			console.log("reset");
 		}
 	}
 
@@ -425,7 +846,8 @@ class App extends Component {
 			case "reset":
 				if(currentMacro.state !== MacroStates.INACTIVE) {
 					currentMacro.reset();
-					console.log("reset");
+
+					this.keyLogger.clear();
 				}
 
 				this.setState({resetPressed: pressed});
@@ -442,131 +864,110 @@ class App extends Component {
 	}
 
 	onStartDateChange(newDate) {
-		var startDate = new Date(newDate);
-		var endDate   = new Date(this.state.endDate);
+		if(this.state.startDate !== newDate) {
+			var startDate = new Date(newDate);
+			var endDate   = new Date(this.state.endDate);
 
-		this.setState({startDate : newDate});
+			this.setState({startDate : newDate});
 
-		if(startDate >= endDate) {
-			endDate = new Date(startDate.getTime());
-			endDate.setDate(endDate.getDate() + 1);
+			if(startDate >= endDate) {
+				endDate = new Date(startDate.getTime());
+				endDate.setDate(endDate.getDate() + 1);
 
-			this.setState({endDate : ConvertDate(endDate)});
+				this.setState({endDate : ConvertDate(endDate)});
+			}
+
+			this.macros[0] = BuildTimeSkipMacro(this.state.startDate, this.state.endDate);
 		}
 	}
 
 	onEndDateChange(newDate) {
-		var endDate   = new Date(newDate);
-		var startDate = new Date(this.state.startDate);
+		if(this.state.endDate !== newDate) {
+			var endDate   = new Date(newDate);
+			var startDate = new Date(this.state.startDate);
 
-		this.setState({endDate : newDate});
+			this.setState({endDate : newDate});
 
-		if(startDate >= endDate) {
-			startDate = new Date(endDate.getTime());
-			startDate.setDate(startDate.getDate() - 1);
+			if(startDate >= endDate) {
+				startDate = new Date(endDate.getTime());
+				startDate.setDate(startDate.getDate() - 1);
 
-			this.setState({startDate : ConvertDate(startDate)});
+				this.setState({startDate : ConvertDate(startDate)});
+			}
+
+			this.macros[0] = BuildTimeSkipMacro(this.state.startDate, this.state.endDate);
 		}
 	}
 
 	handleSwitchKeys(name, pressed) {
-		console.log(name + " : " + pressed);
-
 		if(window.joyconJS === undefined) return;
 
-		this.handleArrowKeys(name, pressed);
+		if(name === "minus") {
+			window.joyconJS.onMinus(pressed);
+		}
 
-		if(name === "home") {
-			window.joyconJS.onHome(pressed);
-			this.setState({homePressed: pressed});
+		if(name === "left-stick") {
+			window.joyconJS.onLeftJoystickPressed(pressed);
+		}
+
+		if(name === "up") {
+			window.joyconJS.onUp(pressed);
+		}
+
+		if(name === "right") {
+			window.joyconJS.onRight(pressed);
+		}
+
+		if(name === "down") {
+			window.joyconJS.onDown(pressed);
+		}
+
+		if(name === "left") {
+			window.joyconJS.onLeft(pressed);
+		}
+
+		if(name === "lsl") {
+			window.joyconJS.onLeftSL(pressed);
+		}
+
+		if(name === "lsr") {
+			window.joyconJS.onLeftSR(pressed);
 		}
 
 		if(name === "plus") {
 			window.joyconJS.onPlus(pressed);
-			this.setState({plusPressed: pressed});
 		}
 
 		if(name === "a") {
 			window.joyconJS.onA(pressed);
-			this.setState({aPressed: pressed});
 		}
 
 		if(name === "b") {
 			window.joyconJS.onB(pressed);
-			this.setState({bPressed: pressed});
 		}
 
 		if(name === "x") {
 			window.joyconJS.onX(pressed);
-			this.setState({xPressed: pressed});
 		}
 
 		if(name === "y") {
 			window.joyconJS.onY(pressed);
-			this.setState({yPressed: pressed});
 		}
 
-		if(name === "sl") {
+		if(name === "rsl") {
 			window.joyconJS.onRightSL(pressed);
-			this.setState({slPressed: pressed});
 		}
 
-		if(name === "sr") {
+		if(name === "rsr") {
 			window.joyconJS.onRightSR(pressed);
-			this.setState({srPressed: pressed});
 		}
 
-		if(name === "stick") {
+		if(name === "right-stick") {
 			window.joyconJS.onRightJoystickPressed(pressed);
-			this.setState({stickPressed: pressed});
 		}
-	}
 
-	handleArrowKeys(name, pressed) {
-		var x = 0;
-		var y = 0;
-
-		if (name === "down"  ||  name === "up"   ||
-			name === "right" ||  name === "left") {
-
-			if(name === "down") {
-				y += pressed? 1 : 0;
-				this.setState({downPressed: pressed});
-
-			} else {
-				y += this.state.downPressed? 1 : 0;
-			}
-
-			if(name === "up") {
-				y += pressed? -1 : 0;
-				this.setState({upPressed: pressed});
-
-			} else {
-				y += this.state.upPressed? -1 : 0;
-			}
-
-			if(name === "left") {
-				x += pressed? -1 : 0;
-				this.setState({leftPressed: pressed});
-
-			} else {
-				x += this.state.leftPressed? -1 : 0;
-			}
-
-			if(name === "right") {
-				x += pressed? 1 : 0;
-				this.setState({rightPressed: pressed});
-
-			} else {
-				x += this.state.rightPressed? 1 : 0;
-			}
-
-			//if (x === 0 && y === 0) {
-			//    window.joyconJS.onRightJoystick(0,0);
-			//
-			//} else {
-			//    window.joyconJS.onRightJoystick(100, Math.atan2(x, y));
-			//}
+		if(name === "home") {
+			window.joyconJS.onHome(pressed);
 		}
 	}
 
@@ -577,13 +978,13 @@ class App extends Component {
 			var images = ["./images/timeskip_icon.png", "./images/timeskip_icon.png"];
 
 			return (
-				<div className = "Macro">
-					<div key = {index} className = "MacroButton" id = {macro.name}
+				<div key = {"macro_" + index} className = "macro">
+					<div key = {"macroButton_" + index} className = "macro-button" id = {macro.name}
 						style = {style} onClick = {e => this.setMacro(index)}>
-						<img className = "Icon" src = {images[index]} alt = {"Icon" + macro.name}/>
+						<img className = "icon" src = {images[index]} alt = {"Icon" + macro.name}/>
 						{macro.name}
 					</div>
-					<ParameterInput key = "paramInput"
+					<ParameterInput key = {"macroParams_" + index}
 						active = {selected} locked = {this.state.locked}
 						macro = {index}
 						startDate = {this.state.startDate} onStartDateChange = {this.onStartDateChange}
@@ -592,42 +993,43 @@ class App extends Component {
 			)
 		});
 
+		const pressed = this.keyLogger.renderPressed();
+		const logging = this.keyLogger.renderLogged();
+
 		return (
-			<div className = "App">
+			<div className = "App" style = {{backgroundImage: "url(./images/background.png)"}}>
 				<div className = "App-header">
-					<img className = "Icon" src = "./images/macro_app_icon.png" alt = "AppIcon"/>
-					<text className = "App-title"
-						style = {{fontWeight: "bold", color: "black"}}> POKÉMACROS </text>
+					<img className = "icon" src = "./images/macro_app_icon.png" alt = "AppIcon"/>
+					<b className = "App-title"
+						style = {{color: "black"}}> POKÉMACROS </b>
 				</div>
 				<div id = "body">
 					<div id = "Macros">
 						{macros}
 					</div>
-					<div id = "MacroParameters">
-						<label id = "ParamCheckBox">
-							Use Parameters:
-							<CheckBox key = "useParams" checked = {this.state.useParams} onChange = {this.onUseParams}/>
-						</label>
+					<div id = "Tracker">
+						<ProgressBar key = "progressbar" percentage = {this.state.macroProgress} />
+						<div id = "KeyLogging">
+							{pressed}
+							{logging}
+						</div>
 					</div>
-					<div>
-						<ProgressBar key = "progress" percentage = {this.state.macroProgress} />
-					</div>
-					<div id = "PlayerButtons" className = "Buttons">
-						<button key = "reset" className = "MacroButton" id = "Reset"
+					<div id = "PlayerButtons">
+						<button key = "reset" className = "macro-button" id = "Reset"
 							onMouseDown  = {e => this.onButtonEvent("reset", true)}
 							onMouseUp    = {e => this.onButtonEvent("reset", false)}
 							onTouchStart = {e => this.onButtonEvent("reset", true)}
 							onTouchEnd   = {e => this.onButtonEvent("reset", false)}>
 							Reset
 						</button>
-						<button key = "play" className = "MacroButton" id = "Play"
+						<button key = "play" className = "macro-button" id = "Play"
 							onMouseDown  = {e => this.onButtonEvent("play", true)}
 							onMouseUp    = {e => this.onButtonEvent("play", false)}
 							onTouchStart = {e => this.onButtonEvent("play", true)}
 							onTouchEnd   = {e => this.onButtonEvent("play", false)}>
 							Play
 						</button>
-						<button key = "pause" className = "MacroButton" id = "Pause"
+						<button key = "pause" className = "macro-button" id = "Pause"
 							onMouseDown  = {e => this.onButtonEvent("pause", true)}
 							onMouseUp    = {e => this.onButtonEvent("pause", false)}
 							onTouchStart = {e => this.onButtonEvent("pause", true)}
@@ -635,7 +1037,7 @@ class App extends Component {
 							Pause
 						</button>
 					</div>
-					<button key = "testA" className = "MacroButton" id = "testA"
+					<button key = "testA" className = "macro-button" id = "testA"
 						onMouseDown  = {e => this.handleSwitchKeys("a", true)}
 						onMouseUp    = {e => this.handleSwitchKeys("a", false)}
 						onTouchStart = {e => this.handleSwitchKeys("a", true)}
