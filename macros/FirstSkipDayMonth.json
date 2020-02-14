@@ -1,0 +1,85 @@
+[
+    {
+        "macro": [
+            {
+                "button"  : "home",
+                "onTime"  : 100,
+                "offTime" : 1000,
+                "count"   : 1
+            },
+            {
+                "button"  : "down",
+                "onTime"  : 100,
+                "offTime" : 200,
+                "count"   : 1
+            },
+            {
+                "button"  : "right",
+                "onTime"  : 100,
+                "offTime" : 200,
+                "count"   : 4
+            },
+            {
+                "button"  : "a",
+                "onTime"  : 100,
+                "offTime" : 200,
+                "count"   : 1
+            },
+            {
+                "button"  : "down",
+                "onTime"  : 100,
+                "offTime" : 200,
+                "count"   : 14
+            },
+            {
+                "button"  : "a",
+                "onTime"  : 100,
+                "offTime" : 500,
+                "count"   : 1
+            },
+            {
+                "button"  : "down",
+                "onTime"  : 100,
+                "offTime" : 200,
+                "count"   : 2
+            },
+            {
+                "button"  : "a",
+                "onTime"  : 100,
+                "offTime" : 500,
+                "count"   : 1
+            },
+            {
+                "button"  : "up",
+                "onTime"  : 100,
+                "offTime" : 200,
+                "count"   : 1
+            },
+            {
+                "button"  : "right",
+                "onTime"  : 100,
+                "offTime" : 200,
+                "count"   : 1
+            },
+            {
+                "button"  : "up",
+                "onTime"  : 100,
+                "offTime" : 200,
+                "count"   : 1
+            },
+            {
+                "button"  : "right",
+                "onTime"  : 100,
+                "offTime" : 200,
+                "count"   : 4
+            },
+            {
+                "button"  : "a",
+                "onTime"  : 100,
+                "offTime" : 600,
+                "count"   : 1
+            }
+        ],
+        "count": 1
+    }
+]

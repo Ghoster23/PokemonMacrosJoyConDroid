@@ -1,0 +1,998 @@
+[
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 31
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 4
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 1
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 28
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 4
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 1
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 30
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 4
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 1
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 29
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 4
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 1
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 30
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 4
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 1
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 29
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 4
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 1
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 30
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 4
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 1
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 30
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 4
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 1
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 29
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 4
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 1
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 30
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 4
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 1
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 29
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 4
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 1
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 30
+    },
+    {
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 3
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 1
+    }
+]
