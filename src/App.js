@@ -22,12 +22,10 @@ function ConvertDate(date) {
 	return date.toISOString().slice(0,10);
 }
 
-function LoadJson(path) {
+async function LoadJson(path) {
 	var res = null;
 
-	fetch(path)
-		.then(response => response.json())
-		.then(json => res = json);
+	res = await fetch(path).then(response => { return response.json(); } );
 
 	return res;
 }
@@ -46,9 +44,9 @@ function ProgressBar(props) {
 function KeyLog(props) {
 	return (
 		<div key = {props.ind} className = "key-log">
-			<b> {props.pressedKey} </b>
-			<b> {props.onTime} </b>
-			<b> {props.offTime} </b>
+			<b className = "key-log-cell"> {props.pressedKey} </b>
+			<b className = "key-log-cell"> {props.onTime} </b>
+			<b className = "key-log-cell"> {props.offTime} </b>
 		</div>
 	);
 }
@@ -104,23 +102,14 @@ class ParameterInput extends React.Component {
 		super(props);
 
 		this.state = {active : false, locked : false};
-
-		this.handleSDChange = this.handleSDChange.bind(this);
-		this.handleEDChange = this.handleEDChange.bind(this);
-	}
-
-	handleSDChange(date) {
-		this.props.onStartDateChange(date);
-	}
-
-	handleEDChange(date) {
-		this.props.onEndDateChange(date);
 	}
 
 	render() {
 		var macro = '';
 
 		var readonly = (!this.props.active || this.props.locked);
+
+		var params = this.props.parameters;
 
 		switch(this.props.macro) {
 			default:
@@ -132,13 +121,15 @@ class ParameterInput extends React.Component {
 						<label className = "parameter">
 							Start Date
 							<DateInput id = "startDate" name = "start-date"
-								date = {this.props.startDate} onChange = {this.handleSDChange}
+								date = {params.startDate}
+								onChange = {date => this.props.eventHandler("startDate", date)}
 								readonly = {readonly}/>
 						</label>
 						<label className = "parameter">
 							End Date
 							<DateInput id = "endDate" name = "end-date"
-								date = {this.props.endDate} onChange = {this.handleEDChange}
+								date = {params.endDate}
+								onChange = {date => this.props.eventHandler("endDate", date)}
 								readonly = {readonly}/>
 						</label>
 					</div>
@@ -175,31 +166,68 @@ function coroutine(f, args) {
 
 class TimeSkipMacroBuilder {
 	constructor() {
-		this.filename = {
-			FstSkipD  = "FirstDaySkip.json",
-			FstSkipM  = "FirstDayMonthSkip.json",
-			FstSkipY  = "FirstDayMonthYearSkip.json",
-			AdvDay    = "AdvanceDay.json",
-			AdvMonth  = "AdvanceMonth.json",
-			AdvYear   = "AdvanceYear.json",
-			AdvDec    = "AdvanceDecember.json",
-			AdvYear   = "AdvanceYear.json",
-			AdvYearLp = "AdvanceYearLeap.json"
-		}
+		this.filenames = {
+			FstSkipD  : "FirstSkipDay.json",
+			FstSkipM  : "FirstSkipDayMonth.json",
+			FstSkipY  : "FirstSkipDayMonthYear.json",
+			AdvDay    : "AdvanceDay.json",
+			AdvMonth  : "AdvanceMonth.json",
+			AdvYear   : "AdvanceYear.json",
+			AdvYearLp : "AdvanceYearLeap.json",
+			AdvDec    : "AdvanceDecember.json"
+		};
 
 		this.loaded = {
-			FstSkipD  = "",
-			FstSkipM  = "",
-			FstSkipY  = "",
-			AdvDay    = "",
-			AdvMonth  = "",
-			AdvYear   = "",
-			AdvDec    = "",
-			AdvYear   = "",
-			AdvYearLp = ""
-		}
+			FstSkipD  : "",
+			FstSkipM  : "",
+			FstSkipY  : "",
+			AdvDay    : "",
+			AdvMonth  : "",
+			AdvYear   : "",
+			AdvDec    : "",
+			AdvYearLp : "",
+			count     :  8
+		};
+		this.loadedCount = 0;
+		this.loadConcluded = false;
 
 		this.daysInMonth = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+		this.startDate = 0;
+		this.endDate   = 0;
+
+		this.currentDate = 0;
+
+		this.macro = 0;
+		this.macroJSON = [];
+
+		var keys = ["FstSkipD", "FstSkipM", "FstSkipY", "AdvDay",
+		"AdvMonth", "AdvYear", "AdvYearLp", "AdvDec"];
+
+		for(var k in keys) {
+			this.loadMacro(keys[k]);
+		}
+	}
+
+	async loadMacro(key) {
+		var filename = this.filenames[key];
+
+		this.loaded[key] = await LoadJson("./macros/" + filename);
+
+		this.loadedCount += 1;
+
+		if(this.loadedCount === this.loaded.count) {
+			this.loadConcluded = true;
+		}
+	}
+
+	getMacro(key) {
+		var copy = JSON.parse(JSON.stringify(this.loaded[key]));
+		return copy;
+	}
+
+	concatToMacro(segment) {
+		this.macroJSON = this.macroJSON.concat(segment);
 	}
 
 	isLeapYear(year) {
@@ -212,26 +240,8 @@ class TimeSkipMacroBuilder {
 		return false;
 	}
 
-	determineFirstSegments(firstDay, secondDay) {
-		segments = [];
-
-		if(firstDay.getMonth() < secondDay.getMonth()) {
-			if(firstDay.getFullYear() < secondDay.getFullYear()) {
-				segments.push(getMacro("FstSkipY"));
-			}
-			else {
-				segments.push(getMacro("FstSkipM"));
-			}
-		}
-		else {
-			segments.push(getMacro("FstSkipD"));
-		}
-
-		return segments;
-	}
-
 	AdvanceDay(days = 1) {
-		macro = getMacro("AdvDay");
+		var macro = this.getMacro("AdvDay");
 
 		macro.count = days;
 
@@ -239,214 +249,170 @@ class TimeSkipMacroBuilder {
 	}
 
 	AdvanceMonth(days = 31) {
-		macro = getMacro("AdvMonth");
+		var macro = this.getMacro("AdvMonth");
 
-		macro.count = days;
+		var segment = macro[0];
+
+		segment.count = days;
+		macro[0] = segment;
 
 		return macro;
+	}
+
+	InitMacro() {
+		// If the day after the start is in the next Month
+		if(this.startDate.getMonth() < this.currentDate.getMonth()) {
+			// If the day after the start is in the next Year
+			if(this.startDate.getFullYear() < this.currentDate.getFullYear()) {
+				this.concatToMacro(this.getMacro("FstSkipY"));  // Advance the Day, Month and Year
+			}
+
+			// It is in the same Year
+			else {
+				this.concatToMacro(this.getMacro("FstSkipM"));  // Advance the Day and Month
+			}
+		}
+
+		// It is in the same Month
+		else {
+			this.concatToMacro(this.getMacro("FstSkipD"));
+		}
+	}
+
+	NextMacroStep() {
+		var cYear  = this.currentDate.getFullYear();
+		var cMonth = this.currentDate.getMonth();
+		var cDay   = this.currentDate.getDate();
+
+		var eYear  = this.endDate.getFullYear();
+		var eMonth = this.endDate.getMonth();
+		var eDay   = this.endDate.getDate();
+
+		var daysToGo = 0;
+
+		// If Target Year has been reached
+		if(cYear === eYear) {
+			// If Target Month has been reached
+			if(cMonth === eMonth) {
+				daysToGo = eDay - cDay;
+
+				this.concatToMacro(this.AdvanceDay(daysToGo));
+
+				this.currentDate.setDate(cDay + daysToGo);
+			}
+
+			// Not at Target Month and at the start of a Month
+			else if(cDay === 1){
+				let i = cMonth;
+				for(; i < eMonth; i++) {
+					daysToGo = this.daysInMonth[i];
+
+					this.macro.concat(this.AdvanceMonth(daysToGo));
+
+					this.currentDate.setDate(cDay + daysToGo);
+				}
+			}
+
+			// Not at Target Month and not at the start of a Month
+			else {
+				daysToGo = this.daysInMonth[cMonth] - cDay + 1;
+
+				this.macro.concat(this.AdvanceMonth(daysToGo));
+
+				this.currentDate.setDate(cDay + daysToGo);
+			}
+		}
+
+		// Not at Target Year and at the start of a Month
+		else if(cDay === 1){
+			// If it's January
+			if(cMonth === 0) {
+				// If it's a Leap Year
+				if(this.isLeapYear(cYear)) {
+					this.concatToMacro(this.getMacro("AdvYearLp"));
+
+					this.currentDate.setDate(cDay + 366);
+				}
+
+				// If Not
+				else {
+					this.concatToMacro(this.getMacro("AdvYear"));
+
+					this.currentDate.setDate(cDay + 365);
+				}
+			}
+
+			// If it's December
+			else if(cMonth === 11) {
+				this.concatToMacro(this.getMacro("AdvDec"));
+
+				this.currentDate.setDate(cDay + 31);
+			}
+
+			// Other Months
+			else {
+				let i = cMonth;
+				for(; i < 11; i++) {
+					daysToGo = this.daysInMonth[i];
+
+					// If it's February and not a Leap Year
+					if(i === 1 && !this.isLeapYear(cYear)) {
+						daysToGo -= 1;
+					}
+
+					this.concatToMacro(this.AdvanceMonth(daysToGo));
+
+					this.currentDate.setDate(cDay + daysToGo);
+				}
+			}
+		}
+
+		// Not Target Year and not at the start of next Month
+		else {
+			// If it is December
+			if(cMonth === 11) {
+				var macro = this.getMacro("AdvDec");
+
+				var segment = macro[0];
+				segment.count = 31 - cDay;
+				macro[0] = segment;
+
+				this.concatToMacro(macro);
+			}
+
+			// Any other Month
+			else {
+				daysToGo = this.daysInMonth[cMonth] - cDay;
+
+				this.concatToMacro(this.AdvanceMonth(daysToGo));
+
+				this.currentDate.setDate(cDay + daysToGo);
+			}
+		}
 	}
 
 	build(sd, ed) {
-		var segments = [];
+		if(!this.loadConcluded) return null;
 
-		var startDate = new Date(sd);
-		var endDate   = new Date(ed);
+		this.macroJSON = [];
 
-		var eYear  = endDate.getFullYear();
-		var eMonth = endDate.getMonth();
-		var eDay   = endDate.getDate();
+		this.startDate = new Date(sd);
+		this.endDate   = new Date(ed);
 
-		var currentDate = new Date(sd);
-		currentDate.setDate(currentDate.getDate() + 1);
+		this.currentDate = new Date(sd);
+		this.currentDate.setDate(this.currentDate.getDate() + 1);
 
-		segments.concat(determineFirstSkip(startDate, currentDate));
+		this.InitMacro();
 
 		// While end Date has not been reached
-		while(currentDate < endDate) {
-			var macro = "";
-
-			var cYear  = currentDate.getFullYear();
-			var cMonth = currentDate.getMonth();
-			var cDay   = currentDate.getDate();
-
-			// If Target Year has been reached
-			if(cYear === eYear) {
-				// If Target Month has been reached
-				if(cMonth === eMonth) {
-					var daysToGo = eDay - cDay;
-
-					segments.push(AdvanceDay(daysToGo));
-					currentDate.setDate(currentDate.getDate() + daysToGo);
-				}
-
-				// Not at Target Month
-				else {
-					var i = cMonth;
-					for(; i < eMonth; i++) {
-						var daysToGo = this.daysInMonth[i];
-						segments.push(AdvanceMonth(daysToGo));
-						currentDate.setDate(currentDate.getDate() + daysToGo);
-					}
-				}
-			}
-
-			// Not at Target Year
-			else {
-				// If it's January
-				if(cMonth === 0) {
-					// If it's a Leap Year
-					if(isLeapYear(cYear)) {
-						segments.push(getMacro("AdvYearLp"));
-						currentDate.setDate(currentDate.getDate() + 366);
-					}
-
-					// If Not
-					else {
-						segments.push(getMacro("AdvYear"));
-						currentDate.setDate(currentDate.getDate() + 365);
-					}
-				}
-
-				// If it's December
-				else if(cMonth === 11) {
-					segments.push(getMacro("AdvDec"));
-					currentDate.setDate(currentDate.getDate() + 31);
-				}
-
-				// Other Months
-				else {
-					var i = cMonth;
-					for(; i < 11; i++) {
-						var daysToGo = this.daysInMonth[i];
-
-						// If it's February and not a Leap Year
-						if(i === 1 && !isLeapYear(cYear)) {
-							daysToGo -= 1;
-						}
-
-						segments.push(AdvanceMonth(daysToGo));
-						currentDate.setDate(currentDate.getDate() + daysToGo);
-					}
-				}
-			}
-
-			// If it is the 1st of the Month
-			if(cDay === 1) {
-				// If it is January
-				if(cMonth === 0) {
-					// If end Date is not this Year
-					if(cYear < eDate.getFullYear()) {
-						macro = "AdvYear";
-						if(isLeapYear(cYear)) macro = "AdvYearLp";
-
-						segments.push(getMacro(macro));
-
-						currentDate.setFullYear(currentDate.getFullYear() + 1);
-					}
-				}
-
-				// If it is another Month
-				else {
-					var i = cMonth;
-					for(; i < 12; i++) {
-						segments.push(advanceMonth(i, cYear));
-					}
-				}
-			}
+		while(this.currentDate < this.endDate) {
+			this.NextMacroStep();
 		}
+
+		this.macro = new Macro("Time Skip", "./images/timeskip_icon.png", this.macroJSON);
+
+		return this.macro;
 	}
-
-	getMacro(key) {
-		var macro = this.loaded[key];
-
-		if(macro === "") {
-			macro = LoadJson("./macros/" + this.filename[key]);
-			this.loaded[key] = macro;
-		}
-
-		return macro;
-	}
-}
-
-function BuildTimeSkipMacro(startDate, endDate) {
-	var paths = [];
-	var reps  = [];
-
-	var pbs = { macro_folder : "./macros/", skipfirst : "SkipFirst",
-	advance : "Advance", day : "Day", month : "Month", year : "Year", json : ".json" }
-
-	var daysInMonth = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-
-	var sDate = new Date(startDate);
-	var eDate = new Date(endDate);
-
-	// First skip
-	paths[0] = pbs.macro_folder + pbs.skipfirst + pbs.day;
-
-	var sDate_p1 = new Date(startDate);
-	sDate_p1.setDate(sDate_p1.getDate() + 1);
-
-	if(sDate.getMonth() < sDate_p1.getMonth()) {
-		paths[0] += pbs.month;
-
-		if(sDate.getFullYear() < sDate_p1.getFullYear()) {
-			paths[0] += pbs.year;
-		}
-	}
-
-	paths[0] += pbs.json;
-	reps[0]   = 1;
-
-	// Suvsequent skips
-	var cDate = sDate_p1;
-	var index = 1;
-
-	while(cDate < eDate) {
-		paths[index] = pbs.macro_folder + pbs.advance + pbs.day;
-
-		var cYear  = cDate.getFullYear();
-		var cMonth = cDate.getMonth();
-		var cDay   = cDate.getDate();
-
-		// If we are in the target Year and Month
-		if(cYear === eDate.getFullYear() && cMonth === eDate.getMonth()) {
-			reps[index] = eDate.getDate() - cDay;
-		}
-		else {
-			var leap_year = true;
-
-			// If it's February check for Leap Year
-			if(cMonth === 2) {
-				leap_year = cYear % 4 === 0 && (cYear % 100 !== 0 || cYear % 400 === 0);
-			}
-
-			// Calculate # of days to the end of the Month
-			reps[index] = daysInMonth[cMonth] - (cDay - 1);
-			if(leap_year) reps[index] -= 1;
-
-			// Add that segment to the macro
-			paths[index] += pbs.json;
-			index++;
-
-			// Add skip for last day of the month to first of the next
-			paths[index] = pbs.macro_folder + pbs.advance + pbs.day + pbs.month;
-			reps[index]  = 1;
-
-			// If it is December signal year skip
-			if(cMonth === 11) {
-				paths[index] += pbs.year;
-			}
-		}
-
-		paths[index] += pbs.json; // Finish path to macro segment
-		cDate.setDate(cDay + reps[index - 1] + 1); // Advance date
-		index++;
-	}
-
-	console.log(paths);
-	console.log(reps);
-
-	return new Macro("Time Skip", paths, reps);
 }
 
 class KeyLogger {
@@ -480,6 +446,7 @@ class KeyLogger {
 
 	logKeyPress(key, time) {
 		this.log[this.log_count] = {key: key, onTime: time, offTime: ''};
+
 		this.log_count++;
 	}
 
@@ -558,8 +525,9 @@ class KeyLogger {
 }
 
 class Macro {
-	constructor(name, paths, repetitions) {
+	constructor(name, icon, segments) {
 		this.name = name;
+		this.icon = icon;
 
 		this.state = MacroStates.INACTIVE;
 
@@ -568,34 +536,26 @@ class Macro {
 
 		this.runner = null;
 
-		this.segments = [];
+		this.segments = segments;
 
 		this.totalSteps = 0;
 		this.currentOverallStep = 0;
 
 		var i;
-		for(i = 0; i < paths.length; i++) {
-			var path  = paths[i];
-			var count = 1;
+		for(i = 0; i < this.segments.length; i++) {
+			var segment = this.segments[i];
 
-			if(repetitions !== undefined) {
-				count = repetitions[i];
+			var subTotal = 0;
+
+			var j;
+			for(j = 0; j < segment.macro.length; j++) {
+				var step = segment.macro[j];
+
+				subTotal += step.count;
 			}
 
-			fetch(path)
-				.then(response => response.json())
-				.then(json => this.initSegmentInfo(json, count));
+			this.totalSteps += subTotal * segment.count;
 		}
-
-		console.log(this.totalSteps);
-	}
-
-	initSegmentInfo(json, count) {
-		this.segments.push({steps : json, reps : count});
-
-		var sum = json.map((step) => step.count).reduce((a, b) => a + b, 0);
-
-		this.totalSteps = this.totalSteps + sum * count;
 	}
 
 	progress() {
@@ -615,8 +575,8 @@ class Macro {
 			for(; i < this.segments.length; i++) {
 				var segment = this.segments[i];
 
-				var steps = segment.steps;
-				var reps  = segment.reps;
+				var steps = segment.macro;
+				var reps  = segment.count;
 
 				// For each Repetition of the Segment
 				var j = 0;
@@ -639,7 +599,7 @@ class Macro {
 						var step = steps[k];
 
 						// Make the response to the App
-						var res = { button : step.button, pressed : true };
+						var res = { button : step.button, pressed : true, time : 0};
 
 						// For each repetition of the Step
 						var l = 0;
@@ -649,11 +609,13 @@ class Macro {
 							// Set timer for the duration of the button press
 							this.wait(Math.max(step.onTime, 20));
 
+							res.time = step.onTime;
+
 							yield res;
 
 							// Wait
 							while(this.onWait) {
-								info = yield;
+								info = yield undefined;
 								if(info.abort) return;
 								this.state = info.state;
 							}
@@ -663,11 +625,13 @@ class Macro {
 							// Set timer for the wait before pressing the next button
 							this.wait(Math.max(step.offTime, 20));
 
+							res.time = step.offTime;
+
 							yield res;
 
 							// Wait for timer to elapse and to not be paused
 							while(this.onWait || this.state === MacroStates.PAUSED) {
-								info = yield;
+								info = yield undefined;
 								if(info.abort) return;
 								this.state = info.state;
 							}
@@ -714,41 +678,314 @@ class Macro {
 	}
 }
 
-class App extends Component {
-
-	constructor(props) {
-		super(props);
-
-		this.state = {};
-
-		this.onButtonEvent = this.onButtonEvent.bind(this);
-
-		this.onUseParams = this.onUseParams.bind(this);
-
-		this.onStartDateChange = this.onStartDateChange.bind(this);
-		this.onEndDateChange = this.onEndDateChange.bind(this);
-
-		this.macros = [];
-
-		this.keyLogger = new KeyLogger();
-		this.currentTime = 0;
-
-		this.selectedMacro = 0;
+class MacroPlayer {
+	constructor() {
+		this.state = { selectedMacro : 0,
+			playState     : 0,
+			macroProgress : 0,
+			loadConcluded : false
+		};
 
 		var today = new Date();
 		var tomorrow = new Date();
 		tomorrow.setDate(tomorrow.getDate() + 1);
 
-		this.macros[0] = BuildTimeSkipMacro(today, tomorrow);
-		console.log(this.macros[0]);
+		this.parameters = {
+			startDate : ConvertDate(today),
+			endDate   : ConvertDate(tomorrow)
+		};
 
-		this.state = {selectedMacro : this.selectedMacro,
-					  macroState : this.macros[this.selectedMacro].state,
-					  macroProgress : 0,
-					  useParams : false,
-					  locked : false,
-					  startDate : ConvertDate(today),
-					  endDate : ConvertDate(tomorrow)};
+		this.macroBuilders = [];
+		this.macroBuilders[0] = new TimeSkipMacroBuilder();
+		this.macroParamsDirty = [false];
+
+		this.macros = Array(this.macroBuilders.length).fill(null);
+	}
+
+	checkLoadConcluded() {
+		var concluded = true;
+
+		var i = 0;
+		for(; i < this.macroBuilders.length; i++) {
+			var builder = this.macroBuilders[i];
+
+			// If builder is not fully loaded
+			if(!builder.loadConcluded) {
+				concluded = false;
+				return;
+			}
+
+			// If it has loaded
+			else {
+				// If macro has not been built
+				if(this.macros[i] === null) {
+					this.buildMacro(i); // Build macro
+				}
+			}
+		}
+
+		this.state.loadConcluded = concluded;
+	}
+
+	selectMacro(index) {
+		if(this.state.selectedMacro === index) return;
+
+		var audio = new Audio("/click.mp3");
+		audio.play();
+
+		var currentMacro = this.macros[this.state.selectedMacro];
+
+		if(currentMacro.state !== MacroStates.INACTIVE) {
+			currentMacro.reset();
+
+			this.state.playState = MacroStates.INACTIVE;
+			this.state.macroProgress = 0;
+		}
+
+		this.state.selectedMacro = index;
+	}
+
+	changeParameter(key, value) {
+		switch(key) {
+			default:
+			return;
+
+			case "startDate":
+				this.onStartDateChange(value);
+				this.macroParamsDirty[0] = true;
+			break;
+
+			case "endDate":
+				this.onEndDateChange(value);
+				this.macroParamsDirty[0] = true;
+			break;
+		}
+	}
+
+	onStartDateChange(newDate) {
+		if(this.parameters.startDate !== newDate) {
+			var startDate = new Date(newDate);
+			var endDate   = new Date(this.parameters.endDate);
+
+			this.parameters.startDate = newDate;
+
+			if(startDate >= endDate) {
+				endDate = new Date(startDate.getTime());
+				endDate.setDate(endDate.getDate() + 1);
+
+				this.parameters.endDate = ConvertDate(endDate);
+			}
+		}
+	}
+
+	onEndDateChange(newDate) {
+		if(this.state.endDate !== newDate) {
+			var endDate   = new Date(newDate);
+			var startDate = new Date(this.parameters.startDate);
+
+			this.parameters.endDate = newDate;
+
+			if(startDate >= endDate) {
+				startDate = new Date(endDate.getTime());
+				startDate.setDate(startDate.getDate() - 1);
+
+				this.parameters.startDate = ConvertDate(startDate);
+			}
+		}
+	}
+
+	play() {
+		var index = this.state.selectedMacro;
+
+		var currentMacro = this.macros[index];
+
+		switch(currentMacro.state) {
+			default:
+			case MacroStates.PLAYING:
+			case MacroStates.PAUSED:
+			break;
+
+			case MacroStates.INACTIVE:
+			case MacroStates.FINISHED:
+				if(currentMacro.state === MacroStates.FINISHED) {
+					currentMacro.reset();
+				}
+
+				if(this.macroParamsDirty[index]) {
+					this.macroParamsDirty[index] = false;
+
+					var builder = this.macroBuilders[index];
+
+					currentMacro = builder
+						.build(this.parameters.startDate,
+								this.parameters.endDate);
+
+					this.macros[0] = currentMacro;
+				}
+
+				currentMacro.startRunner();
+			break;
+		}
+
+		currentMacro.state = MacroStates.PLAYING;
+
+		this.state.playState = MacroStates.PLAYING;
+
+		return true;
+	}
+
+	pause() {
+		var currentMacro = this.macros[this.state.selectedMacro];
+
+		if(currentMacro.state === MacroStates.PLAYING) {
+			currentMacro.state = MacroStates.PAUSED;
+			console.log("paused");
+			this.state.playState = MacroStates.PAUSED;
+
+			return true;
+		}
+
+		return false;
+	}
+
+	reset() {
+		var currentMacro = this.macros[this.state.selectedMacro];
+
+		if(currentMacro.state !== MacroStates.INACTIVE) {
+			currentMacro.reset();
+
+			this.state.playState = MacroStates.INACTIVE
+			this.state.macroProgress = 0;
+
+			return true;
+		}
+
+		return false;
+	}
+
+	getMacroState() {
+		return { macroState : this.state.playState,
+				macroProgress : this.state.macroProgress };
+	}
+
+	getMacrosRenderData() {
+		var renderData = [];
+
+		var i = 0;
+		for(; i < this.macros.length; i++) {
+			var macro = this.macros[i];
+
+			renderData[i] = {
+				name : macro.name,
+				icon : macro.icon,
+				parameters : this.parameters
+			};
+		}
+
+		return renderData;
+	}
+
+	buildMacro(index) {
+		var builder = this.macroBuilders[index];
+
+		switch(index) {
+			default:
+			return;
+
+			case 0: // Time Skip
+				this.macros[0] = builder
+					.build(this.parameters.startDate,
+							this.parameters.endDate);
+			break;
+		}
+	}
+
+	updateMacros() {
+		var i = 0;
+		for(; i < this.macroBuilders.length; i++) {
+			var dirty   = this.macroParamsDirty[i];
+
+			if(dirty) {
+				this.buildMacro(i);
+
+				this.macroParamsDirty[i] = false;
+			}
+		}
+	}
+
+	update() {
+		var response = undefined;
+
+		if(!this.state.loadConcluded) {
+			this.checkLoadConcluded();
+		}
+
+		// If Load has been completed
+		if(this.state.loadConcluded) {
+			var runResult = undefined;
+
+			// Get current Macro
+			var currentMacro = this.macros[this.state.selectedMacro];
+
+			if(currentMacro === undefined) {
+				return;
+			}
+
+			//console.log(currentMacro.state);
+			switch(currentMacro.state) {
+				default:
+				case MacroStates.INACTIVE:
+				case MacroStates.FINISHED:
+				return;
+
+				case MacroStates.PLAYING:
+					runResult = currentMacro
+						.runner({state : currentMacro.state, abort : false});
+				break;
+
+				case MacroStates.PAUSED:
+					runResult = currentMacro
+						.runner({state : currentMacro.state, abort : false});
+				break;
+			}
+
+			// If a result was obtained
+			if(runResult !== undefined) {
+				// If the result includes a value
+				if(runResult.value !== undefined) {
+					response = runResult.value;
+				}
+
+				if(runResult.done) currentMacro.state = MacroStates.FINISHED;
+			}
+
+			this.state.playState = currentMacro.state;
+			this.state.macroProgress = currentMacro.progress() * 100;
+		}
+
+		return response;
+	}
+}
+
+class App extends Component {
+	constructor(props) {
+		super(props);
+
+		this.state = {};
+
+		this.onButtonEvent   = this.onButtonEvent.bind(this);
+		this.parameterChange = this.parameterChange.bind(this);
+
+		this.macroPlayer = new MacroPlayer();
+
+		this.keyLogger = new KeyLogger();
+		this.currentTime = 0;
+
+		this.state = {selectedMacro :  0,
+					  macroState    : -1,
+					  macroProgress :  0,
+					  locked        : false
+		};
 	}
 
 	componentDidMount() {
@@ -765,37 +1002,13 @@ class App extends Component {
 	update() {
 		this.currentTime += 20;
 
-		var currentMacro = this.macros[this.selectedMacro];
+		var res = this.macroPlayer.update(this.currentTime);
 
-		this.setState({selectedMacro : this.selectedMacro});
-		this.setState({macroState : currentMacro.state});
-		this.setState({macroProgress : currentMacro.progress() * 100});
-
-		if(currentMacro.state === MacroStates.FINISHED) return;
-
-		var runner = currentMacro.runner;
-
-		if(runner === null) return;
-
-		var res = runner({state : currentMacro.state, abort : false});
+		this.setState(this.macroPlayer.getMacroState());
 
 		if(res !== undefined) {
-			if(res.value !== undefined) {
-				this.handleSwitchKeys(res.value.button, res.value.pressed);
-				this.keyLogger.update(res.value.button, res.value.pressed, this.currentTime);
-			}
-
-			if(res.done) currentMacro.state = MacroStates.FINISHED;
-		}
-	}
-
-	setMacro(id) {
-		this.selectedMacro = id;
-
-		var currentMacro = this.macros[this.selectedMacro];
-
-		if(currentMacro.state !== MacroStates.INACTIVE) {
-			currentMacro.reset();
+			this.handleSwitchKeys(res.button, res.pressed);
+			this.keyLogger.update(res.button, res.pressed, res.time);
 		}
 	}
 
@@ -806,97 +1019,30 @@ class App extends Component {
 			audio.play();
 		}
 
-		var currentMacro = this.macros[this.selectedMacro];
-
 		switch (name) {
 			default:
 			return;
 
 			case "play":
-				switch(currentMacro.state) {
-					default:
-					case MacroStates.PLAYING:
-					case MacroStates.PAUSED:
-					break;
-
-					case MacroStates.INACTIVE:
-						currentMacro.startRunner();
-					break;
-
-					case MacroStates.FINISHED:
-						currentMacro.reset();
-
-						currentMacro.startRunner();
-					break;
-				}
-
-				currentMacro.state = MacroStates.PLAYING;
-
-				this.setState({playPressed: pressed});
+				this.macroPlayer.play();
 			break;
 
 			case "pause":
-				if(currentMacro.state === MacroStates.PLAYING) {
-					currentMacro.state = MacroStates.PAUSED;
-				}
-
-				this.setState({pausePressed: pressed});
+				this.macroPlayer.pause();
 			break;
 
 			case "reset":
-				if(currentMacro.state !== MacroStates.INACTIVE) {
-					currentMacro.reset();
-
+				if(this.macroPlayer.reset()) {
 					this.keyLogger.clear();
 				}
-
-				this.setState({resetPressed: pressed});
 			break;
 		}
 
-		this.setState({macroState : currentMacro.state});
+		this.setState(this.macroPlayer.getMacroState());
 	}
 
-	onUseParams() {
-		var toggle = !this.state.useParams;
-
-		this.setState({ useParams : toggle });
-	}
-
-	onStartDateChange(newDate) {
-		if(this.state.startDate !== newDate) {
-			var startDate = new Date(newDate);
-			var endDate   = new Date(this.state.endDate);
-
-			this.setState({startDate : newDate});
-
-			if(startDate >= endDate) {
-				endDate = new Date(startDate.getTime());
-				endDate.setDate(endDate.getDate() + 1);
-
-				this.setState({endDate : ConvertDate(endDate)});
-			}
-
-			this.macros[0] = BuildTimeSkipMacro(this.state.startDate, this.state.endDate);
-		}
-	}
-
-	onEndDateChange(newDate) {
-		if(this.state.endDate !== newDate) {
-			var endDate   = new Date(newDate);
-			var startDate = new Date(this.state.startDate);
-
-			this.setState({endDate : newDate});
-
-			if(startDate >= endDate) {
-				startDate = new Date(endDate.getTime());
-				startDate.setDate(startDate.getDate() - 1);
-
-				this.setState({startDate : ConvertDate(startDate)});
-			}
-
-			this.macros[0] = BuildTimeSkipMacro(this.state.startDate, this.state.endDate);
-		}
+	parameterChange(key, value) {
+		this.macroPlayer.changeParameter(key, value);
 	}
 
 	handleSwitchKeys(name, pressed) {
@@ -971,30 +1117,45 @@ class App extends Component {
 		}
 	}
 
-	render() {
-		const macros = this.macros.map((macro, index) => {
-			var selected = this.selectedMacro === index;
-			var style = (selected ? {background : "black", color : "white"} : {background : "white", color : "black"});
-			var images = ["./images/timeskip_icon.png", "./images/timeskip_icon.png"];
+	renderMacros() {
+		if(!this.macroPlayer.state.loadConcluded) return (<b> Loading </b>);
 
-			return (
-				<div key = {"macro_" + index} className = "macro">
-					<div key = {"macroButton_" + index} className = "macro-button" id = {macro.name}
-						style = {style} onClick = {e => this.setMacro(index)}>
-						<img className = "icon" src = {images[index]} alt = {"Icon" + macro.name}/>
+		var macros = this.macroPlayer.getMacrosRenderData();
+
+		var render = [];
+
+		var i = 0;
+		for(; i < macros.length; i++) {
+			let macro = macros[i];
+
+			let selected = this.macroPlayer.state.selectedMacro === i;
+
+			let style = {background : "white"};
+			if(selected) style = {background : "black"};
+
+			render[i] = (
+				<div key = {"macro_" + i} className = "macro">
+					<div key = {"macroButton_" + i} className = "macro-button" id = {macro.name}
+						style = {style} onClick = {e => this.selectMacro(i)}>
+						<img className = "icon" src = {macro.icon} alt = {"Icon" + macro.name}/>
 						{macro.name}
 					</div>
-					<ParameterInput key = {"macroParams_" + index}
+					<ParameterInput key = {"macroParams_" + i}
 						active = {selected} locked = {this.state.locked}
-						macro = {index}
-						startDate = {this.state.startDate} onStartDateChange = {this.onStartDateChange}
-						endDate   = {this.state.endDate}   onEndDateChange   = {this.onEndDateChange} />
+						macro = {i} parameters = {macro.parameters}
+						eventHandler = {this.parameterChange}/>
 				</div>
-			)
-		});
+			);
+		}
 
+		return render;
+	}
+
+	render() {
 		const pressed = this.keyLogger.renderPressed();
 		const logging = this.keyLogger.renderLogged();
+
+		const macros = this.renderMacros();
 
 		return (
 			<div className = "App" style = {{backgroundImage: "url(./images/background.png)"}}>
@@ -1004,9 +1165,7 @@ class App extends Component {
 						style = {{color: "black"}}> POKÉMACROS </b>
 				</div>
 				<div id = "body">
-					<div id = "Macros">
-						{macros}
-					</div>
+					{macros}
 					<div id = "Tracker">
 						<ProgressBar key = "progressbar" percentage = {this.state.macroProgress} />
 						<div id = "KeyLogging">
@@ -1015,21 +1174,21 @@ class App extends Component {
 						</div>
 					</div>
 					<div id = "PlayerButtons">
-						<button key = "reset" className = "macro-button" id = "Reset"
+						<button key = "reset" className = "player-button" id = "Reset"
 							onMouseDown  = {e => this.onButtonEvent("reset", true)}
 							onMouseUp    = {e => this.onButtonEvent("reset", false)}
 							onTouchStart = {e => this.onButtonEvent("reset", true)}
 							onTouchEnd   = {e => this.onButtonEvent("reset", false)}>
 							Reset
 						</button>
-						<button key = "play" className = "macro-button" id = "Play"
+						<button key = "play" className = "player-button" id = "Play"
 							onMouseDown  = {e => this.onButtonEvent("play", true)}
 							onMouseUp    = {e => this.onButtonEvent("play", false)}
 							onTouchStart = {e => this.onButtonEvent("play", true)}
 							onTouchEnd   = {e => this.onButtonEvent("play", false)}>
 							Play
 						</button>
-						<button key = "pause" className = "macro-button" id = "Pause"
+						<button key = "pause" className = "player-button" id = "Pause"
 							onMouseDown  = {e => this.onButtonEvent("pause", true)}
 							onMouseUp    = {e => this.onButtonEvent("pause", false)}
 							onTouchStart = {e => this.onButtonEvent("pause", true)}
@@ -1037,7 +1196,7 @@ class App extends Component {
 							Pause
 						</button>
 					</div>
-					<button key = "testA" className = "macro-button" id = "testA"
+					<button key = "testA" className = "player-button" id = "testA"
 						onMouseDown  = {e => this.handleSwitchKeys("a", true)}
 						onMouseUp    = {e => this.handleSwitchKeys("a", false)}
 						onTouchStart = {e => this.handleSwitchKeys("a", true)}

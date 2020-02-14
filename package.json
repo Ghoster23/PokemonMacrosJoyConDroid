@@ -11,12 +11,12 @@
     "react-scripts": "3.3.0"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -b build master -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -33,7 +33,7 @@
       "last 1 safari version"
     ]
   },
-  "homepage": "https://ghoster23.github.io/PokemonMacrosJoyConDroid",
+  "homepage": "https://ghoster23.github.io/PokemonMacrosJoyConDroid/",
   "devDependencies": {
     "gh-pages": "^2.2.0"
   }

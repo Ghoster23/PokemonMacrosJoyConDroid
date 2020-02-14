@@ -1,32 +1,37 @@
 [
     {
-        "button"  : "a",
-        "onTime"  : 100,
-        "offTime" : 600,
-        "count"   : 1
-    },
-    {
-        "button"  : "left",
-        "onTime"  : 100,
-        "offTime" : 200,
-        "count"   : 5
-    },
-    {
-        "button"  : "up",
-        "onTime"  : 100,
-        "offTime" : 200,
-        "count"   : 1
-    },
-    {
-        "button"  : "right",
-        "onTime"  : 100,
-        "offTime" : 200,
-        "count"   : 5
-    },
-    {
-        "button"  : "a",
-        "onTime"  : 100,
-        "offTime" : 200,
-        "count"   : 1
+        "macro": [
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 600,
+                "count": 1
+            },
+            {
+                "button": "left",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 5
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            }
+        ],
+        "count": 1
     }
 ]
