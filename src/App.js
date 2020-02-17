@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
 
+const MonthLength = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
 const MacroStates = {
 	INACTIVE: 0,
 	PLAYING:  1,
@@ -19,7 +21,12 @@ function arrayFindIndex(array, toFind) {
 }
 
 function ConvertDate(date) {
-	return date.toISOString().slice(0,10);
+	let day   = date.getDate().toString();
+	let month = (date.getMonth() + 1).toString();
+	if(date.getMonth() < 9) month = "0" + month;
+	let year  = date.getFullYear().toString();
+
+	return year + "-" + month + "-" + day;
 }
 
 async function LoadJson(path) {
@@ -164,6 +171,112 @@ function coroutine(f, args) {
 	}
 }
 
+class SimpleDate {
+	constructor(str) {
+		this.day   = 0;
+		this.month = 0;
+		this.year  = 0;
+
+		this.setFromString(str);
+	}
+
+	isLeapYear() {
+		if(this.year % 4 === 0) {
+			if(this.year % 100 !== 0 || this.year % 400 === 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	increment(days) {
+		this.day += days;
+
+		let len = MonthLength[this.month];
+
+		let rem = this.day - len;
+		if(this.month === 1 && !this.isLeapYear()) {
+			rem += 1;
+		}
+
+		while(rem > 0) {
+			this.day = rem;
+
+			this.month += 1;
+
+			if(this.month === 12) {
+				this.year += 1;
+				this.month = 0;
+			}
+
+			len = MonthLength[this.month];
+
+			rem = this.day - len;
+		}
+	}
+
+	decrement(days) {
+		this.day -= days;
+
+		while(this.day <= 0) {
+			this.month -= 1;
+
+			if(this.month < 0) {
+				this.month = 11;
+				this.year -= 1;
+			}
+
+			let len = MonthLength[this.month];
+			if(this.month === 1 && !this.isLeapYear()) len -= 1;
+
+			this.day += len;
+		}
+	}
+
+	daysToNextMonth() {
+		let len = MonthLength[this.month];
+		if(this.month === 1 && !this.isLeapYear()) len -= 1;
+
+		return len - this.day + 1;
+	}
+
+	setFromString(str = "2020-01-01") {
+		this.year  = parseInt(str.substr(0, 4));
+		this.month = parseInt(str.substr(5, 2));
+		this.day   = parseInt(str.substr(8, 2));
+	}
+
+	toString() {
+		let day   = this.day.toString();
+
+		let month = this.month.toString();
+		if(this.month < 9) month = "0" + month;
+
+		let year  = this.year.toString();
+
+		return year + "-" + month + "-" + day;
+	}
+
+	compare(other) {
+		let oYear = other.year;
+
+		if(oYear === this.year) {
+			let oMonth = other.Month;
+
+			if(oMonth === this.month) {
+				return other.day - this.day;
+			}
+			else {
+				return oMonth - this.month;
+			}
+		}
+		else {
+			return oYear - this.year;
+		}
+	}
+}
+
 class TimeSkipMacroBuilder {
 	constructor() {
 		this.filenames = {
@@ -230,17 +343,13 @@ class TimeSkipMacroBuilder {
 		this.macroJSON = this.macroJSON.concat(segment);
 	}
 
-	isLeapYear(year) {
-		if(year % 4 === 0) {
-			if(year % 100 !== 0 || year % 400 === 0) {
-				return true;
-			}
-		}
-
-		return false;
+	addToCurrentDate(days) {
+		console.log(this.currentDate.toString(), " + ", days, " =");
+		this.currentDate.increment(days);
+		console.log(this.currentDate.toString());
 	}
 
-	AdvanceDay(days = 1) {
+	AdvanceDay(days) {
 		var macro = this.getMacro("AdvDay");
 
 		macro[0].count = days;
@@ -248,12 +357,12 @@ class TimeSkipMacroBuilder {
 		return macro;
 	}
 
-	AdvanceMonth(days = 31) {
+	AdvanceMonth(days) {
 		var macro = this.getMacro("AdvMonth");
 
 		var segment = macro[0];
 
-		segment.count = days;
+		segment.count = days - 1;
 		macro[0] = segment;
 
 		return macro;
@@ -261,9 +370,9 @@ class TimeSkipMacroBuilder {
 
 	InitMacro() {
 		// If the day after the start is in the next Month
-		if(this.startDate.getMonth() < this.currentDate.getMonth()) {
+		if(this.startDate.month < this.currentDate.month) {
 			// If the day after the start is in the next Year
-			if(this.startDate.getFullYear() < this.currentDate.getFullYear()) {
+			if(this.startDate.year < this.currentDate.year) {
 				this.concatToMacro(this.getMacro("FstSkipY"));  // Advance the Day, Month and Year
 			}
 
@@ -277,126 +386,93 @@ class TimeSkipMacroBuilder {
 		else {
 			this.concatToMacro(this.getMacro("FstSkipD"));
 		}
+
+		this.addToCurrentDate(1);
 	}
 
 	NextMacroStep() {
-		var cYear  = this.currentDate.getFullYear();
-		var cMonth = this.currentDate.getMonth();
-		var cDay   = this.currentDate.getDate();
+		var cYear  = this.currentDate.year;
+		var cMonth = this.currentDate.month;
+		var cDay   = this.currentDate.day;
 
-		var eYear  = this.endDate.getFullYear();
-		var eMonth = this.endDate.getMonth();
-		var eDay   = this.endDate.getDate();
+		var eYear  = this.endDate.year;
+		var eMonth = this.endDate.month;
+		var eDay   = this.endDate.day;
 
 		var daysToGo = 0;
 
 		// If Target Year has been reached
 		if(cYear === eYear) {
-			console.log("Same Year");
-
 			// If Target Month has been reached
 			if(cMonth === eMonth) {
-				console.log("Same Month");
-
 				daysToGo = eDay - cDay;
 
 				this.concatToMacro(this.AdvanceDay(daysToGo));
-				console.log(daysToGo);
-
-				this.currentDate.setDate(cDay + daysToGo);
 			}
 
 			// Not at Target Month and at the start of a Month
 			else if(cDay === 1){
-				console.log("Not at Target Month");
-				console.log("First of the Month");
-
 				let i = cMonth;
 				for(; i < eMonth; i++) {
-					daysToGo = this.daysInMonth[i];
+					daysToGo = MonthLength[i];
 
 					this.concatToMacro(this.AdvanceMonth(daysToGo));
-
-					this.currentDate.setDate(cDay + daysToGo);
 				}
 			}
 
 			// Not at Target Month and not at the start of a Month
 			else {
-				console.log("Not at the Target Month nor at the 1st of the Month");
-
-				daysToGo = this.daysInMonth[cMonth] - cDay + 1;
+				daysToGo = this.currentDate.daysToNextMonth();
 
 				this.concatToMacro(this.AdvanceMonth(daysToGo));
-
-				this.currentDate.setDate(cDay + daysToGo);
 			}
+
+			this.addToCurrentDate(daysToGo);
 		}
 
 		// Not at Target Year and at the start of a Month
 		else if(cDay === 1){
-			console.log("Not at Target Year but at 1st of the Month");
-
 			// If it's January
 			if(cMonth === 0) {
-				console.log("January");
-
 				// If it's a Leap Year
 				if(this.isLeapYear(cYear)) {
-					console.log("Leap Year");
-
 					this.concatToMacro(this.getMacro("AdvYearLp"));
 
-					this.currentDate.setDate(cDay + 366);
+					this.addToCurrentDate(366);
 				}
 
 				// If Not
 				else {
-					console.log("Not Leap Year");
-
 					this.concatToMacro(this.getMacro("AdvYear"));
 
-					this.currentDate.setDate(cDay + 365);
+					this.addToCurrentDate(365);
 				}
 			}
 
 			// If it's December
 			else if(cMonth === 11) {
-				console.log("December");
-
 				this.concatToMacro(this.getMacro("AdvDec"));
 
-				this.currentDate.setDate(cDay + 31);
+				this.addToCurrentDate(31);
 			}
 
 			// Other Months
 			else {
-				console.log("Non-Relevant Month");
-
 				let i = cMonth;
 				for(; i < 11; i++) {
-					daysToGo = this.daysInMonth[i];
-
-					// If it's February and not a Leap Year
-					if(i === 1 && !this.isLeapYear(cYear)) {
-						daysToGo -= 1;
-					}
+					daysToGo = this.currentDate.daysToNextMonth();
 
 					this.concatToMacro(this.AdvanceMonth(daysToGo));
 
-					this.currentDate.setDate(cDay + daysToGo);
+					this.addToCurrentDate(daysToGo);
 				}
 			}
 		}
 
-		// Not Target Year and not at the start of next Month
+		// Not Target Year and not at the start of a Month
 		else {
-			console.log("Not Target Year nor at the 1st of the Month");
-
 			// If it is December
 			if(cMonth === 11) {
-				console.log("December");
-
 				var macro = this.getMacro("AdvDec");
 
 				var segment = macro[0];
@@ -404,17 +480,17 @@ class TimeSkipMacroBuilder {
 				macro[0] = segment;
 
 				this.concatToMacro(macro);
+
+				this.addToCurrentDate(31);
 			}
 
 			// Any other Month
 			else {
-				console.log("Non-Relevant Month");
-
-				daysToGo = this.daysInMonth[cMonth] - cDay;
+				daysToGo = this.currentDate.daysToNextMonth();
 
 				this.concatToMacro(this.AdvanceMonth(daysToGo));
 
-				this.currentDate.setDate(cDay + daysToGo);
+				this.addToCurrentDate(daysToGo);
 			}
 		}
 	}
@@ -424,20 +500,20 @@ class TimeSkipMacroBuilder {
 
 		this.macroJSON = [];
 
-		this.startDate = new Date(sd);
-		this.endDate   = new Date(ed);
+		this.startDate = new SimpleDate(sd);
+		this.endDate   = new SimpleDate(ed);
 
-		this.currentDate = new Date(sd);
-		this.currentDate.setDate(this.currentDate.getDate() + 1);
+		this.currentDate = new SimpleDate(sd);
 
 		this.InitMacro();
 
 		// While end Date has not been reached
-		while(this.currentDate < this.endDate) {
+		while(this.currentDate.compare(this.endDate) < 0) {
 			this.NextMacroStep();
-		}
 
-		console.log(this.macroJSON);
+			let segment = this.macroJSON[this.macroJSON.length - 1];
+			console.log(segment.name, " x", segment.count);
+		}
 
 		this.macro = new Macro("Time Skip", "./images/timeskip_icon.png", this.macroJSON);
 
@@ -608,8 +684,6 @@ class Macro {
 				var steps = segment.macro;
 				var reps  = segment.count;
 
-				console.log("Executing ", segment.name, " x", reps);
-
 				// For each Repetition of the Segment
 				var j = 0;
 				for(; j < reps; j++) {
@@ -718,7 +792,7 @@ class MacroPlayer {
 			loadConcluded : false
 		};
 
-		var today = new Date();
+		var today    = new Date();
 		var tomorrow = new Date();
 		tomorrow.setDate(tomorrow.getDate() + 1);
 
@@ -796,32 +870,32 @@ class MacroPlayer {
 
 	onStartDateChange(newDate) {
 		if(this.parameters.startDate !== newDate) {
-			var startDate = new Date(newDate);
-			var endDate   = new Date(this.parameters.endDate);
+			var startDate = new SimpleDate(newDate);
+			var endDate   = new SimpleDate(this.parameters.endDate);
 
 			this.parameters.startDate = newDate;
 
-			if(startDate >= endDate) {
-				endDate = new Date(startDate.getTime());
-				endDate.setDate(endDate.getDate() + 1);
+			if(startDate.compare(endDate) <= 0) {
+				endDate = new SimpleDate(startDate.toString());
+				endDate.increment(1);
 
-				this.parameters.endDate = ConvertDate(endDate);
+				this.parameters.endDate = endDate.toString();
 			}
 		}
 	}
 
 	onEndDateChange(newDate) {
 		if(this.state.endDate !== newDate) {
-			var endDate   = new Date(newDate);
-			var startDate = new Date(this.parameters.startDate);
+			var endDate   = new SimpleDate(newDate);
+			var startDate = new SimpleDate(this.parameters.startDate);
 
 			this.parameters.endDate = newDate;
 
-			if(startDate >= endDate) {
-				startDate = new Date(endDate.getTime());
-				startDate.setDate(startDate.getDate() - 1);
+			if(startDate.compare(endDate)) {
+				startDate = new SimpleDate(endDate.toString());
+				startDate.decrement(1);
 
-				this.parameters.startDate = ConvertDate(startDate);
+				this.parameters.startDate = startDate.toString();
 			}
 		}
 	}
