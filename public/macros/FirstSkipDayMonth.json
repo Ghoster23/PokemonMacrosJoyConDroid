@@ -1,5 +1,6 @@
 [
     {
+        "name": "First Day skip (Advance Month)",
         "macro": [
             {
                 "button"  : "home",

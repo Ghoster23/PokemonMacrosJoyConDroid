@@ -243,7 +243,7 @@ class TimeSkipMacroBuilder {
 	AdvanceDay(days = 1) {
 		var macro = this.getMacro("AdvDay");
 
-		macro.count = days;
+		macro[0].count = days;
 
 		return macro;
 	}
@@ -292,22 +292,30 @@ class TimeSkipMacroBuilder {
 
 		// If Target Year has been reached
 		if(cYear === eYear) {
+			console.log("Same Year");
+
 			// If Target Month has been reached
 			if(cMonth === eMonth) {
+				console.log("Same Month");
+
 				daysToGo = eDay - cDay;
 
 				this.concatToMacro(this.AdvanceDay(daysToGo));
+				console.log(daysToGo);
 
 				this.currentDate.setDate(cDay + daysToGo);
 			}
 
 			// Not at Target Month and at the start of a Month
 			else if(cDay === 1){
+				console.log("Not at Target Month");
+				console.log("First of the Month");
+
 				let i = cMonth;
 				for(; i < eMonth; i++) {
 					daysToGo = this.daysInMonth[i];
 
-					this.macro.concat(this.AdvanceMonth(daysToGo));
+					this.concatToMacro(this.AdvanceMonth(daysToGo));
 
 					this.currentDate.setDate(cDay + daysToGo);
 				}
@@ -315,9 +323,11 @@ class TimeSkipMacroBuilder {
 
 			// Not at Target Month and not at the start of a Month
 			else {
+				console.log("Not at the Target Month nor at the 1st of the Month");
+
 				daysToGo = this.daysInMonth[cMonth] - cDay + 1;
 
-				this.macro.concat(this.AdvanceMonth(daysToGo));
+				this.concatToMacro(this.AdvanceMonth(daysToGo));
 
 				this.currentDate.setDate(cDay + daysToGo);
 			}
@@ -325,10 +335,16 @@ class TimeSkipMacroBuilder {
 
 		// Not at Target Year and at the start of a Month
 		else if(cDay === 1){
+			console.log("Not at Target Year but at 1st of the Month");
+
 			// If it's January
 			if(cMonth === 0) {
+				console.log("January");
+
 				// If it's a Leap Year
 				if(this.isLeapYear(cYear)) {
+					console.log("Leap Year");
+
 					this.concatToMacro(this.getMacro("AdvYearLp"));
 
 					this.currentDate.setDate(cDay + 366);
@@ -336,6 +352,8 @@ class TimeSkipMacroBuilder {
 
 				// If Not
 				else {
+					console.log("Not Leap Year");
+
 					this.concatToMacro(this.getMacro("AdvYear"));
 
 					this.currentDate.setDate(cDay + 365);
@@ -344,6 +362,8 @@ class TimeSkipMacroBuilder {
 
 			// If it's December
 			else if(cMonth === 11) {
+				console.log("December");
+
 				this.concatToMacro(this.getMacro("AdvDec"));
 
 				this.currentDate.setDate(cDay + 31);
@@ -351,6 +371,8 @@ class TimeSkipMacroBuilder {
 
 			// Other Months
 			else {
+				console.log("Non-Relevant Month");
+
 				let i = cMonth;
 				for(; i < 11; i++) {
 					daysToGo = this.daysInMonth[i];
@@ -369,8 +391,12 @@ class TimeSkipMacroBuilder {
 
 		// Not Target Year and not at the start of next Month
 		else {
+			console.log("Not Target Year nor at the 1st of the Month");
+
 			// If it is December
 			if(cMonth === 11) {
+				console.log("December");
+
 				var macro = this.getMacro("AdvDec");
 
 				var segment = macro[0];
@@ -382,6 +408,8 @@ class TimeSkipMacroBuilder {
 
 			// Any other Month
 			else {
+				console.log("Non-Relevant Month");
+
 				daysToGo = this.daysInMonth[cMonth] - cDay;
 
 				this.concatToMacro(this.AdvanceMonth(daysToGo));
@@ -408,6 +436,8 @@ class TimeSkipMacroBuilder {
 		while(this.currentDate < this.endDate) {
 			this.NextMacroStep();
 		}
+
+		console.log(this.macroJSON);
 
 		this.macro = new Macro("Time Skip", "./images/timeskip_icon.png", this.macroJSON);
 
@@ -577,6 +607,8 @@ class Macro {
 
 				var steps = segment.macro;
 				var reps  = segment.count;
+
+				console.log("Executing ", segment.name, " x", reps);
 
 				// For each Repetition of the Segment
 				var j = 0;
