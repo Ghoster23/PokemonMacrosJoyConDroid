@@ -243,14 +243,14 @@ class SimpleDate {
 
 	setFromString(str = "2020-01-01") {
 		this.year  = parseInt(str.substr(0, 4));
-		this.month = parseInt(str.substr(5, 2));
+		this.month = parseInt(str.substr(5, 2)) - 1;
 		this.day   = parseInt(str.substr(8, 2));
 	}
 
 	toString() {
 		let day   = this.day.toString();
 
-		let month = this.month.toString();
+		let month = (this.month + 1).toString();
 		if(this.month < 9) month = "0" + month;
 
 		let year  = this.year.toString();
@@ -262,7 +262,7 @@ class SimpleDate {
 		let oYear = other.year;
 
 		if(oYear === this.year) {
-			let oMonth = other.Month;
+			let oMonth = other.month;
 
 			if(oMonth === this.month) {
 				return other.day - this.day;
@@ -303,8 +303,6 @@ class TimeSkipMacroBuilder {
 		};
 		this.loadedCount = 0;
 		this.loadConcluded = false;
-
-		this.daysInMonth = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 		this.startDate = 0;
 		this.endDate   = 0;
@@ -508,14 +506,13 @@ class TimeSkipMacroBuilder {
 		this.InitMacro();
 
 		// While end Date has not been reached
-		while(this.currentDate.compare(this.endDate) < 0) {
+		while(this.currentDate.compare(this.endDate) > 0) {
 			this.NextMacroStep();
-
-			let segment = this.macroJSON[this.macroJSON.length - 1];
-			console.log(segment.name, " x", segment.count);
 		}
 
 		this.macro = new Macro("Time Skip", "./images/timeskip_icon.png", this.macroJSON);
+
+		console.log(this.macro.toString());
 
 		return this.macro;
 	}
@@ -782,6 +779,19 @@ class Macro {
 			this.runner = null;
 		}
 	}
+
+	toString() {
+		let text = "Macro - \n";
+
+		let i = 0;
+		for(; i < this.segments.length; i++) {
+			let seg = this.segments[i];
+
+			text += "\t" + seg.name + " x" + seg.count.toString() + "\n";
+		}
+
+		return text;
+	}
 }
 
 class MacroPlayer {
@@ -891,7 +901,7 @@ class MacroPlayer {
 
 			this.parameters.endDate = newDate;
 
-			if(startDate.compare(endDate)) {
+			if(startDate.compare(endDate) <= 0) {
 				startDate = new SimpleDate(endDate.toString());
 				startDate.decrement(1);
 
