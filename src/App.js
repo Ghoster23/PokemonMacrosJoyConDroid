@@ -38,6 +38,19 @@ async function LoadJson(path) {
 }
 
 // React Components
+function MacroButton(props) {
+	var style = { background : "white" };
+	if(props.selected) style = {background : "black"};
+
+	return (
+		<div className = "macro-button" id = {props.name} style = {style}
+			onClick = {e => props.clickHandler(props.index)}>
+			<img className = "icon" src = {props.src} alt = {"Icon " + props.name}/>
+			{props.name}
+		</div>
+	);
+}
+
 function ProgressBar(props) {
 	const width = { width : `${props.percentage}%` };
 
@@ -98,8 +111,36 @@ class DateInput extends React.Component {
 
 	render() {
 		return (
-			<input type = "date" className = "date-input" readOnly = {this.props.readonly}
+			<input type = "date" className = "date-input"
+			readOnly = {this.props.readonly}
 			value = {this.props.date} onChange = {this.handleChange}/>
+		);
+	}
+}
+
+class IntegerInput extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {};
+
+		this.handleChange = this.handleChange.bind(this);
+	}
+
+	handleChange(event) {
+		if(event.target.value === "") {
+			this.props.onChange(1);
+			return;
+		}
+
+		this.props.onChange(parseInt(event.currentTarget.value));
+	}
+
+	render() {
+		return (
+			<input type = "number" className = "integer-input"
+			readOnly = {this.props.readonly}
+			value = {this.props.value} onChange = {this.handleChange}
+			max = {this.props.max} min = {this.props.min}/>
 		);
 	}
 }
@@ -112,36 +153,51 @@ class ParameterInput extends React.Component {
 	}
 
 	render() {
-		var macro = '';
-
-		var readonly = (!this.props.active || this.props.locked);
-
 		var params = this.props.parameters;
 
 		switch(this.props.macro) {
 			default:
 			break;
 
-			case 0:
-				macro = (
+			case "Time Skip":
+				return (
 					<div className = "macro-parameters" id = "TimeSkipParams">
-						<label className = "parameter">
-							Start Date
-							<DateInput id = "startDate" name = "start-date"
-								date = {params.startDate}
-								onChange = {date => this.props.eventHandler("startDate", date)}
-								readonly = {readonly}/>
-						</label>
-						<label className = "parameter">
-							End Date
-							<DateInput id = "endDate" name = "end-date"
-								date = {params.endDate}
-								onChange = {date => this.props.eventHandler("endDate", date)}
-								readonly = {readonly}/>
-						</label>
+						<div className = "parameters-entry">
+							<label className = "parameter-label">
+								Start Date
+							</label>
+							<div className = "parameter">
+								<DateInput id = "startDate" name = "start-date"
+									date = {params.startDate}
+									onChange = {date => this.props.eventHandler("startDate", date)}
+									/>
+							</div>
+						</div>
+						<div className = "parameters-entry">
+							<label className = "parameter-label">
+								End Date
+							</label>
+							<div className = "parameter">
+								<DateInput id = "endDate" name = "end-date"
+									date = {params.endDate}
+									onChange = {date => this.props.eventHandler("endDate", date)}
+									/>
+							</div>
+						</div>
+						<div className = "parameters-entry">
+							<label className = "parameter-label">
+								Days to Advance
+							</label>
+							<div className = "parameter">
+								<IntegerInput id = "daysToAdvance" name = "days-to-advance"
+									value = {params.daysToAdvance}
+									onChange = {value => this.props.eventHandler("daysToAdvance", value)}
+									min = "1" max = "10000"
+									/>
+							</div>
+						</div>
 					</div>
 				);
-			break;
 
 			case 1:
 				return (
@@ -155,8 +211,6 @@ class ParameterInput extends React.Component {
 					</div>
 				);
 		}
-
-		return macro;
 	}
 }
 
@@ -213,6 +267,9 @@ class SimpleDate {
 			len = MonthLength[this.month];
 
 			rem = this.day - len;
+			if(this.month === 1 && !this.isLeapYear()) {
+				rem += 1;
+			}
 		}
 	}
 
@@ -234,6 +291,15 @@ class SimpleDate {
 		}
 	}
 
+	dayDifference(other) {
+		var date1 = new Date(this.toString());
+		var date2 = new Date(other.toString());
+
+		var diff = date2.getTime() - date1.getTime();
+
+		return diff / (1000 * 60 * 60 * 24);
+	}
+
 	daysToNextMonth() {
 		let len = MonthLength[this.month];
 		if(this.month === 1 && !this.isLeapYear()) len -= 1;
@@ -249,6 +315,7 @@ class SimpleDate {
 
 	toString() {
 		let day   = this.day.toString();
+		if(this.day <= 9) day = "0" + day;
 
 		let month = (this.month + 1).toString();
 		if(this.month < 9) month = "0" + month;
@@ -277,7 +344,7 @@ class SimpleDate {
 	}
 }
 
-class TimeSkipMacroBuilder {
+class JSONManeger {
 	constructor() {
 		this.filenames = {
 			FstSkipD  : "FirstSkipDay.json",
@@ -301,16 +368,9 @@ class TimeSkipMacroBuilder {
 			AdvYearLp : "",
 			count     :  8
 		};
+
 		this.loadedCount = 0;
 		this.loadConcluded = false;
-
-		this.startDate = 0;
-		this.endDate   = 0;
-
-		this.currentDate = 0;
-
-		this.macro = 0;
-		this.macroJSON = [];
 
 		var keys = ["FstSkipD", "FstSkipM", "FstSkipY", "AdvDay",
 		"AdvMonth", "AdvYear", "AdvYearLp", "AdvDec"];
@@ -329,6 +389,7 @@ class TimeSkipMacroBuilder {
 
 		if(this.loadedCount === this.loaded.count) {
 			this.loadConcluded = true;
+			console.log("JSON Load Concluded");
 		}
 	}
 
@@ -336,17 +397,143 @@ class TimeSkipMacroBuilder {
 		var copy = JSON.parse(JSON.stringify(this.loaded[key]));
 		return copy;
 	}
+}
+
+class MacroBuilder {
+	constructor(jsonM, name, icon) {
+		this.jsonManager = jsonM;
+
+		this.name = name;
+		this.icon = icon;
+
+		this.macro = 0;
+		this.macroJSON = [];
+
+		this.parameters = {};
+		this.paramHandlers = {};
+	}
+
+	changeParameter(key, value) {
+		let handler = this.paramHandlers[key];
+
+		return handler(value);
+	}
+
+	getMacro(key) {
+		if(!this.jsonManager.loadConcluded) return null;
+
+		return this.jsonManager.getMacro(key);
+	}
 
 	concatToMacro(segment) {
 		this.macroJSON = this.macroJSON.concat(segment);
 	}
 
-	addToCurrentDate(days) {
-		console.log(this.currentDate.toString(), " + ", days, " =");
-		this.currentDate.increment(days);
-		console.log(this.currentDate.toString());
+	// Render
+	getRenderData() {
+		return {
+			name : this.name,
+			icon : this.icon,
+			parameters : this.parameters
+		};
+	}
+}
+
+class TimeSkipMacroBuilder extends MacroBuilder {
+	constructor(jsonM) {
+		super(jsonM, "Time Skip", "./images/timeskip_icon.png");
+
+		// Init Parameters
+		var today    = new Date();
+		var tomorrow = new Date();
+		tomorrow.setDate(tomorrow.getDate() + 1);
+
+		this.parameters.startDate = ConvertDate(today);
+		this.parameters.endDate   = ConvertDate(tomorrow);
+		this.parameters.daysToAdvance = 1;
+
+		this.onStartDateChange = this.onStartDateChange.bind(this);
+		this.onEndDateChange   = this.onEndDateChange.bind(this);
+		this.onDaysToAdvanceChange = this.onDaysToAdvanceChange.bind(this);
+
+		this.paramHandlers = {
+			startDate : this.onStartDateChange,
+			endDate   : this.onEndDateChange,
+			daysToAdvance : this.onDaysToAdvanceChange
+		};
+
+		this.currentDate = 0;
 	}
 
+	// Parameter Handlers
+	onStartDateChange(newDate) {
+		if(this.parameters.startDate !== newDate) {
+			var startDate = new SimpleDate(newDate);
+			var endDate   = new SimpleDate(this.parameters.endDate);
+
+			this.parameters.startDate = newDate;
+
+			if(startDate.compare(endDate) <= 0) {
+				endDate = new SimpleDate(startDate.toString());
+				endDate.increment(1);
+
+				this.parameters.endDate = endDate.toString();
+			}
+
+			this.parameters.daysToAdvance = startDate.dayDifference(endDate);
+
+			return true;
+		}
+
+		return false;
+	}
+
+	onEndDateChange(newDate) {
+		if(this.parameters.endDate !== newDate) {
+			var endDate   = new SimpleDate(newDate);
+			var startDate = new SimpleDate(this.parameters.startDate);
+
+			this.parameters.endDate = newDate;
+
+			if(startDate.compare(endDate) <= 0) {
+				startDate = new SimpleDate(endDate.toString());
+				startDate.decrement(1);
+
+				this.parameters.startDate = startDate.toString();
+			}
+
+			this.parameters.daysToAdvance = startDate.dayDifference(endDate);
+
+			return true;
+		}
+
+		return false;
+	}
+
+	onDaysToAdvanceChange(days) {
+		if(this.parameters.daysToAdvance !== days) {
+			this.parameters.daysToAdvance = days;
+
+			var endDate = new SimpleDate(this.parameters.startDate);
+
+			endDate.increment(days);
+
+			var maxDate = new SimpleDate("2059-11-31");
+
+			if(endDate.compare(maxDate) < 0) {
+				this.parameters.endDate = "2059-11-31";
+			}
+			else {
+				this.parameters.endDate = endDate.toString();
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	// Build Macro
 	AdvanceDay(days) {
 		var macro = this.getMacro("AdvDay");
 
@@ -366,11 +553,11 @@ class TimeSkipMacroBuilder {
 		return macro;
 	}
 
-	InitMacro() {
+	InitMacro(startDate, currentDate) {
 		// If the day after the start is in the next Month
-		if(this.startDate.month < this.currentDate.month) {
+		if(startDate.month < this.currentDate.month) {
 			// If the day after the start is in the next Year
-			if(this.startDate.year < this.currentDate.year) {
+			if(startDate.year < this.currentDate.year) {
 				this.concatToMacro(this.getMacro("FstSkipY"));  // Advance the Day, Month and Year
 			}
 
@@ -385,19 +572,19 @@ class TimeSkipMacroBuilder {
 			this.concatToMacro(this.getMacro("FstSkipD"));
 		}
 
-		this.addToCurrentDate(1);
+		currentDate.increment(1);
 	}
 
-	NextMacroStep() {
-		var cYear  = this.currentDate.year;
-		var cMonth = this.currentDate.month;
-		var cDay   = this.currentDate.day;
+	NextMacroSegment(currentDate, endDate) {
+		let cYear  = currentDate.year;
+		let cMonth = currentDate.month;
+		let cDay   = currentDate.day;
 
-		var eYear  = this.endDate.year;
-		var eMonth = this.endDate.month;
-		var eDay   = this.endDate.day;
+		let eYear  = endDate.year;
+		let eMonth = endDate.month;
+		let eDay   = endDate.day;
 
-		var daysToGo = 0;
+		let daysToGo = 0;
 
 		// If Target Year has been reached
 		if(cYear === eYear) {
@@ -420,12 +607,12 @@ class TimeSkipMacroBuilder {
 
 			// Not at Target Month and not at the start of a Month
 			else {
-				daysToGo = this.currentDate.daysToNextMonth();
+				daysToGo = currentDate.daysToNextMonth();
 
 				this.concatToMacro(this.AdvanceMonth(daysToGo));
 			}
 
-			this.addToCurrentDate(daysToGo);
+			currentDate.increment(daysToGo);
 		}
 
 		// Not at Target Year and at the start of a Month
@@ -436,14 +623,14 @@ class TimeSkipMacroBuilder {
 				if(this.isLeapYear(cYear)) {
 					this.concatToMacro(this.getMacro("AdvYearLp"));
 
-					this.addToCurrentDate(366);
+					currentDate.increment(366);
 				}
 
 				// If Not
 				else {
 					this.concatToMacro(this.getMacro("AdvYear"));
 
-					this.addToCurrentDate(365);
+					currentDate.increment(365);
 				}
 			}
 
@@ -451,18 +638,18 @@ class TimeSkipMacroBuilder {
 			else if(cMonth === 11) {
 				this.concatToMacro(this.getMacro("AdvDec"));
 
-				this.addToCurrentDate(31);
+				currentDate.increment(31);
 			}
 
 			// Other Months
 			else {
 				let i = cMonth;
 				for(; i < 11; i++) {
-					daysToGo = this.currentDate.daysToNextMonth();
+					daysToGo = currentDate.daysToNextMonth();
 
 					this.concatToMacro(this.AdvanceMonth(daysToGo));
 
-					this.addToCurrentDate(daysToGo);
+					currentDate.increment(daysToGo);
 				}
 			}
 		}
@@ -479,7 +666,7 @@ class TimeSkipMacroBuilder {
 
 				this.concatToMacro(macro);
 
-				this.addToCurrentDate(31);
+				currentDate.increment(31);
 			}
 
 			// Any other Month
@@ -488,31 +675,29 @@ class TimeSkipMacroBuilder {
 
 				this.concatToMacro(this.AdvanceMonth(daysToGo));
 
-				this.addToCurrentDate(daysToGo);
+				currentDate.increment(daysToGo);
 			}
 		}
 	}
 
-	build(sd, ed) {
-		if(!this.loadConcluded) return null;
+	build() {
+		if(!this.jsonManager.loadConcluded) return null;
 
-		this.macroJSON = [];
+		this.macroJSON = []; // Clear Macro JSON
 
-		this.startDate = new SimpleDate(sd);
-		this.endDate   = new SimpleDate(ed);
+		var startDate = new SimpleDate(this.parameters.startDate);
+		var endDate   = new SimpleDate(this.parameters.endDate);
 
-		this.currentDate = new SimpleDate(sd);
+		var currentDate = new SimpleDate(this.parameters.startDate);
 
-		this.InitMacro();
+		this.InitMacro(startDate, currentDate);
 
-		// While end Date has not been reached
-		while(this.currentDate.compare(this.endDate) > 0) {
-			this.NextMacroStep();
+		// While End Date has not been reached
+		while(currentDate.compare(endDate) > 0) {
+			this.NextMacroSegment(currentDate, endDate);
 		}
 
-		this.macro = new Macro("Time Skip", "./images/timeskip_icon.png", this.macroJSON);
-
-		console.log(this.macro.toString());
+		this.macro = new Macro(this.name, this.icon, this.macroJSON);
 
 		return this.macro;
 	}
@@ -802,41 +987,38 @@ class MacroPlayer {
 			loadConcluded : false
 		};
 
-		var today    = new Date();
-		var tomorrow = new Date();
-		tomorrow.setDate(tomorrow.getDate() + 1);
+		// Create JSON Manager
+		this.jsonManager = new JSONManeger();
 
-		this.parameters = {
-			startDate : ConvertDate(today),
-			endDate   : ConvertDate(tomorrow)
-		};
+		// Create Macro Builders
+		this.builders = [];
+		this.builders[0] = new TimeSkipMacroBuilder(this.jsonManager);
+		this.builders[1] = new TimeSkipMacroBuilder(this.jsonManager);
+		this.builders[2] = new TimeSkipMacroBuilder(this.jsonManager);
 
-		this.macroBuilders = [];
-		this.macroBuilders[0] = new TimeSkipMacroBuilder();
-		this.macroParamsDirty = [false];
+		let macroCount = this.builders.length;
 
-		this.macros = Array(this.macroBuilders.length).fill(null);
+		// Init Dirty Bit Array
+		this.dirtyMacro = Array(macroCount).fill(false);
+
+		// Init Macro Array
+		this.macros = Array(macroCount).fill(null);
+
+		this.selectMacro = this.selectMacro.bind(this);
+		this.changeParameter = this.changeParameter.bind(this);
 	}
 
 	checkLoadConcluded() {
-		var concluded = true;
+		var concluded = this.jsonManager.loadConcluded;
+
+		if(!concluded) return;
 
 		var i = 0;
-		for(; i < this.macroBuilders.length; i++) {
-			var builder = this.macroBuilders[i];
+		for(; i < this.builders.length; i++) {
+			this.buildMacro(i); // Build macro
 
-			// If builder is not fully loaded
-			if(!builder.loadConcluded) {
+			if(this.macros[i] === null || this.macros[i] === undefined) {
 				concluded = false;
-				return;
-			}
-
-			// If it has loaded
-			else {
-				// If macro has not been built
-				if(this.macros[i] === null) {
-					this.buildMacro(i); // Build macro
-				}
 			}
 		}
 
@@ -862,51 +1044,10 @@ class MacroPlayer {
 	}
 
 	changeParameter(key, value) {
-		switch(key) {
-			default:
-			return;
+		let builder = this.builders[this.state.selectedMacro];
 
-			case "startDate":
-				this.onStartDateChange(value);
-				this.macroParamsDirty[0] = true;
-			break;
-
-			case "endDate":
-				this.onEndDateChange(value);
-				this.macroParamsDirty[0] = true;
-			break;
-		}
-	}
-
-	onStartDateChange(newDate) {
-		if(this.parameters.startDate !== newDate) {
-			var startDate = new SimpleDate(newDate);
-			var endDate   = new SimpleDate(this.parameters.endDate);
-
-			this.parameters.startDate = newDate;
-
-			if(startDate.compare(endDate) <= 0) {
-				endDate = new SimpleDate(startDate.toString());
-				endDate.increment(1);
-
-				this.parameters.endDate = endDate.toString();
-			}
-		}
-	}
-
-	onEndDateChange(newDate) {
-		if(this.state.endDate !== newDate) {
-			var endDate   = new SimpleDate(newDate);
-			var startDate = new SimpleDate(this.parameters.startDate);
-
-			this.parameters.endDate = newDate;
-
-			if(startDate.compare(endDate) <= 0) {
-				startDate = new SimpleDate(endDate.toString());
-				startDate.decrement(1);
-
-				this.parameters.startDate = startDate.toString();
-			}
+		if(builder.changeParameter(key, value)) {
+			this.dirtyMacro[this.state.selectedMacro] = true;
 		}
 	}
 
@@ -914,6 +1055,7 @@ class MacroPlayer {
 		var index = this.state.selectedMacro;
 
 		var currentMacro = this.macros[index];
+		var isDirty      = this.dirtyMacro[index];
 
 		switch(currentMacro.state) {
 			default:
@@ -927,16 +1069,10 @@ class MacroPlayer {
 					currentMacro.reset();
 				}
 
-				if(this.macroParamsDirty[index]) {
-					this.macroParamsDirty[index] = false;
+				if(isDirty) {
+					this.dirtyMacro[index] = false;
 
-					var builder = this.macroBuilders[index];
-
-					currentMacro = builder
-						.build(this.parameters.startDate,
-								this.parameters.endDate);
-
-					this.macros[0] = currentMacro;
+					this.buildMacro(index);
 				}
 
 				currentMacro.startRunner();
@@ -955,7 +1091,7 @@ class MacroPlayer {
 
 		if(currentMacro.state === MacroStates.PLAYING) {
 			currentMacro.state = MacroStates.PAUSED;
-			console.log("paused");
+
 			this.state.playState = MacroStates.PAUSED;
 
 			return true;
@@ -984,36 +1120,33 @@ class MacroPlayer {
 				macroProgress : this.state.macroProgress };
 	}
 
-	getMacrosRenderData() {
-		var renderData = [];
+	getAllMacroData() {
+		let dataArray = [];
 
-		var i = 0;
-		for(; i < this.macros.length; i++) {
-			var macro = this.macros[i];
+		let i = 0;
+		for(; i < this.builders.length; i++) {
+			let builder = this.builders[i];
 
-			renderData[i] = {
-				name : macro.name,
-				icon : macro.icon,
-				parameters : this.parameters
-			};
+			dataArray[i] = builder.getRenderData();
 		}
 
-		return renderData;
+		return dataArray;
+	}
+
+	getCurrentMacroData() {
+		var builder = this.builders[this.state.selectedMacro];
+
+		return builder.getRenderData();
 	}
 
 	buildMacro(index) {
-		var builder = this.macroBuilders[index];
+		var builder = this.builders[index];
 
-		switch(index) {
-			default:
-			return;
+		var macro = builder.build(this.parameters);
 
-			case 0: // Time Skip
-				this.macros[0] = builder
-					.build(this.parameters.startDate,
-							this.parameters.endDate);
-			break;
-		}
+		this.macros[index] = macro;
+
+		console.log(macro.toString());
 	}
 
 	updateMacros() {
@@ -1043,7 +1176,7 @@ class MacroPlayer {
 			// Get current Macro
 			var currentMacro = this.macros[this.state.selectedMacro];
 
-			if(currentMacro === undefined) {
+			if(currentMacro === undefined || currentMacro === null) {
 				return;
 			}
 
@@ -1090,6 +1223,7 @@ class App extends Component {
 		this.state = {};
 
 		this.onButtonEvent   = this.onButtonEvent.bind(this);
+		this.selectMacro     = this.selectMacro.bind(this);
 		this.parameterChange = this.parameterChange.bind(this);
 
 		this.macroPlayer = new MacroPlayer();
@@ -1155,6 +1289,10 @@ class App extends Component {
 		}
 
 		this.setState(this.macroPlayer.getMacroState());
+	}
+
+	selectMacro(index) {
+		this.macroPlayer.selectMacro(index);
 	}
 
 	parameterChange(key, value) {
@@ -1236,35 +1374,36 @@ class App extends Component {
 	renderMacros() {
 		if(!this.macroPlayer.state.loadConcluded) return (<b> Loading </b>);
 
-		var macros = this.macroPlayer.getMacrosRenderData();
+		let selected = this.macroPlayer.state.selectedMacro;
 
-		var render = [];
+		let data = this.macroPlayer.getAllMacroData();
 
-		var i = 0;
-		for(; i < macros.length; i++) {
-			let macro = macros[i];
+		let index = -1;
 
-			let selected = this.macroPlayer.state.selectedMacro === i;
+		return data.map((entry) => {
+				index++;
 
-			let style = {background : "white"};
-			if(selected) style = {background : "black"};
+				var isSelected = selected === index;
 
-			render[i] = (
-				<div key = {"macro_" + i} className = "macro">
-					<div key = {"macroButton_" + i} className = "macro-button" id = {macro.name}
-						style = {style} onClick = {e => this.selectMacro(i)}>
-						<img className = "icon" src = {macro.icon} alt = {"Icon" + macro.name}/>
-						{macro.name}
-					</div>
-					<ParameterInput key = {"macroParams_" + i}
-						active = {selected} locked = {this.state.locked}
-						macro = {i} parameters = {macro.parameters}
-						eventHandler = {this.parameterChange}/>
-				</div>
-			);
-		}
+				return (
+					<MacroButton key = {"macro_" + index.toString()} index = {index}
+						selected = {isSelected} name = {entry.name} src = {entry.icon}
+						clickHandler = {this.selectMacro}/>
+				);
+			}
+		);
+	}
 
-		return render;
+	renderParameters() {
+		if(!this.macroPlayer.state.loadConcluded) return (<b> Loading </b>);
+
+		let data = this.macroPlayer.getCurrentMacroData();
+
+		return (
+			<ParameterInput key = {"macroParams"}
+				macro = {data.name} parameters = {data.parameters}
+				eventHandler = {this.parameterChange}/>
+		);
 	}
 
 	render() {
@@ -1272,6 +1411,7 @@ class App extends Component {
 		const logging = this.keyLogger.renderLogged();
 
 		const macros = this.renderMacros();
+		const parameters = this.renderParameters();
 
 		return (
 			<div className = "App" style = {{backgroundImage: "url(./images/background.png)"}}>
@@ -1281,7 +1421,13 @@ class App extends Component {
 						style = {{color: "black"}}> POKÉMACROS </b>
 				</div>
 				<div id = "body">
-					{macros}
+					<div id = "Macros">
+							{macros}
+					</div>
+					<div id = "Parameters">
+							<b>Parameters</b>
+							{parameters}
+					</div>
 					<div id = "Tracker">
 						<ProgressBar key = "progressbar" percentage = {this.state.macroProgress} />
 						<div id = "KeyLogging">
