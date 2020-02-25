@@ -43,10 +43,14 @@ function MacroButton(props) {
 	if(props.selected) style = {background : "black"};
 
 	return (
-		<div className = "macro-button" id = {props.name} style = {style}
-			onClick = {e => props.clickHandler(props.index)}>
-			<img className = "icon" src = {props.src} alt = {"Icon " + props.name}/>
-			{props.name}
+		<div className = "macro">
+			<div className = "macro-button" id = {props.name} style = {style}
+				onClick = {e => props.clickHandler(props.index)}>
+				<img className = "icon" src = {props.src} alt = {"Icon " + props.name}/>
+			</div>
+			<label className = "macro-button-label">
+				{props.name}
+			</label>
 		</div>
 	);
 }
@@ -186,7 +190,7 @@ class ParameterInput extends React.Component {
 						</div>
 						<div className = "parameters-entry">
 							<label className = "parameter-label">
-								Days to Advance
+								Skip Count
 							</label>
 							<div className = "parameter">
 								<IntegerInput id = "daysToAdvance" name = "days-to-advance"
@@ -995,6 +999,10 @@ class MacroPlayer {
 		this.builders[0] = new TimeSkipMacroBuilder(this.jsonManager);
 		this.builders[1] = new TimeSkipMacroBuilder(this.jsonManager);
 		this.builders[2] = new TimeSkipMacroBuilder(this.jsonManager);
+		this.builders[3] = new TimeSkipMacroBuilder(this.jsonManager);
+		this.builders[4] = new TimeSkipMacroBuilder(this.jsonManager);
+		this.builders[5] = new TimeSkipMacroBuilder(this.jsonManager);
+		this.builders[6] = new TimeSkipMacroBuilder(this.jsonManager);
 
 		let macroCount = this.builders.length;
 
@@ -1425,7 +1433,6 @@ class App extends Component {
 							{macros}
 					</div>
 					<div id = "Parameters">
-							<b>Parameters</b>
 							{parameters}
 					</div>
 					<div id = "Tracker">

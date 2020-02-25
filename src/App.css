@@ -11,6 +11,7 @@ html, body {
   color: white;
   background-repeat: no-repeat;
   background-size: 100vw 100vh;
+  font-family: Verdana, Geneva, sans-serif;
 }
 
 .App-header {
@@ -42,44 +43,41 @@ html, body {
 
 #Macros {
     display: flex;
-    flex-flow: row nowrap;
+    flex-flow: row wrap;
     justify-content: space-evenly;
     align-items: center;
     width: 90vw;
-    height: 21vh;
+    height: 24vh;
     margin: 0px auto 0px auto;
     text-transform: uppercase;
+    flex-shrink: 0;
 }
 
 .macro {
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: flex-start;
-    justify-content: space-evenly;
-    width: 90vw;
-    height: 18vw;
-    margin: auto;
+    margin: 0px 0.5vw 1vh 0.5vw;
 }
 
 .macro-button {
     background-color: #FFFFFF;
-    border: none;
     color: white;
-    width: 15vw;
-    height: 15vw;
-    text-align: center;
-    text-decoration: none;
-    font-size: 1.5vh;
-    margin: auto;
+    width: 8vh;
+    height: 8vh;
     border-radius: 50%;
     flex-shrink: 0;
     box-shadow: 0px 0.6vh 1.2vh -0.4vh #2a2a2a;
+    transition: background-color .2s linear;
+}
+
+.macro-button-label {
+    font-size: 1.5vh;
 }
 
 #Parameters {
   width: 90vw;
-  height: 31.5vh;
+  height: 22.5vh;
   text-align: left;
+  margin: auto;
+  flex-shrink: 0;
 }
 
 .macro-parameters {
@@ -101,7 +99,7 @@ html, body {
 }
 
 .parameter-label {
-    font-size: 16px;
+    line-height: 4vh;
     width: 40%;
     background-color: #cacaca;
     color: #000;
@@ -109,7 +107,7 @@ html, body {
 }
 
 .parameter {
-    font-size: 16px;
+    line-height: 4vh;
     width: 60%;
     background-color: #fff;
     display: flex;
@@ -132,8 +130,9 @@ html, body {
   display: flex;
   flex-flow: column nowrap;
   margin: auto;
-  height: 31.5vh;
+  height: 29.5vh;
   width: 100%;
+  flex-shrink: 0;
 }
 
 .progress-bar {
@@ -144,6 +143,7 @@ html, body {
     margin-bottom: 2.75vh;
     height: 5vh;
     width: 80vw;
+    flex-shrink: 0;
 }
 
 .filler {
@@ -211,6 +211,7 @@ html, body {
   flex-flow: row wrap;
   align-items: flex-start;
   justify-content: space-evenly;
+  flex-shrink: 0;
 }
 
 .player-button {
@@ -218,12 +219,12 @@ html, body {
     border: none;
     color: black;
     font-weight: bold;
-    width: 8.4vh;
-    height: 8.4vh;
+    width: 8vh;
+    height: 8vh;
     text-align: center;
     text-decoration: none;
-    font-size: 20px;
-    margin: auto;
+    font-size: 2vh;
+    margin: 0.5vh auto 0px auto;
     border-radius: 50%;
     flex-shrink: 0;
     box-shadow: 0px 0.6vh 1.2vh -0.4vh #2a2a2a;
