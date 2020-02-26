@@ -29,31 +29,13 @@
             {
                 "button": "a",
                 "onTime": 100,
-                "offTime": 1500,
-                "count": 1
-            },
-            {
-                "button": "a",
-                "onTime": 100,
-                "offTime": 1000,
-                "count": 1
-            },
-            {
-                "button": "a",
-                "onTime": 100,
                 "offTime": 2000,
-                "count": 1
+                "count": 4
             },
             {
                 "button": "a",
                 "onTime": 100,
-                "offTime": 1000,
-                "count": 1
-            },
-            {
-                "button": "a",
-                "onTime": 100,
-                "offTime": 5000,
+                "offTime": 3000,
                 "count": 1
             },
             {
