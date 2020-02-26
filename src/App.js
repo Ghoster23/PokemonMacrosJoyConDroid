@@ -68,6 +68,7 @@ function ProgressBar(props) {
 function KeyLog(props) {
 	return (
 		<div key = {props.ind} className = "key-log">
+			<b className = "key-log-cell"> {props.index} </b>
 			<b className = "key-log-cell"> {props.pressedKey} </b>
 			<b className = "key-log-cell"> {props.onTime} </b>
 			<b className = "key-log-cell"> {props.offTime} </b>
@@ -392,7 +393,8 @@ class JSONManeger {
 			AdvYear   : "AdvanceYear.json",
 			AdvYearLp : "AdvanceYearLeap.json",
 			AdvDec    : "AdvanceDecember.json",
-			LotoID    : "LotoID.json"
+			LotoID    : "LotoID.json",
+			Return    : "ReturnToGameFromSettings.json"
 		};
 
 		this.loaded = {
@@ -405,14 +407,15 @@ class JSONManeger {
 			AdvDec    : "",
 			AdvYearLp : "",
 			LotoID    : "",
-			count     :  9
+			Return    : "",
+			count     : 10
 		};
 
 		this.loadedCount = 0;
 		this.loadConcluded = false;
 
 		var keys = ["FstSkipD", "FstSkipM", "FstSkipY", "AdvDay",
-		"AdvMonth", "AdvYear", "AdvYearLp", "AdvDec", "LotoID"];
+		"AdvMonth", "AdvYear", "AdvYearLp", "AdvDec", "LotoID", "Return"];
 
 		for(var k in keys) {
 			this.loadMacro(keys[k]);
@@ -734,6 +737,8 @@ class TimeSkipMacroBuilder extends MacroBuilder {
 			this.NextMacroSegment(currentDate, endDate);
 		}
 
+		this.concatToMacro(this.getMacro("Return"));
+
 		this.macro = new Macro(this.name, this.icon, this.macroJSON);
 
 		return this.macro;
@@ -836,6 +841,8 @@ class LotoIDMacroBuilder extends MacroBuilder {
 			this.AdvanceDate(currentDate);
 			currentDate.increment(1);
 
+			this.concatToMacro(this.getMacro("Return"));
+
 			this.concatToMacro(this.getMacro("LotoID"));
 		}
 
@@ -875,7 +882,8 @@ class KeyLogger {
 	}
 
 	logKeyPress(key, time) {
-		this.log[this.log_count] = {key: key, onTime: time, offTime: ''};
+		this.log[this.log_count] = {index: this.log_count, key: key,
+			onTime: time, offTime: ''};
 
 		this.log_count++;
 	}
@@ -942,7 +950,8 @@ class KeyLogger {
 			var i = 0;
 			for(; i < Math.min(3, this.log_count); i++) {
 				var l = this.log[this.log_count - (i + 1)];
-				keyLogs.push(<KeyLog key = {"keylog_" + i} pressedKey = {l.key} onTime = {l.onTime} offTime = {l.offTime}/>);
+				keyLogs.push(<KeyLog key = {"keylog_" + i} index = {l.index.toString()}
+				pressedKey = {l.key} onTime = {l.onTime} offTime = {l.offTime}/>);
 			}
 		}
 
@@ -1136,7 +1145,7 @@ class MacroPlayer {
 		this.builders = [];
 		this.builders[0] = new TimeSkipMacroBuilder(this.jsonManager);
 		this.builders[1] = new LotoIDMacroBuilder(this.jsonManager);
-		
+
 		let macroCount = this.builders.length;
 
 		// Init Dirty Bit Array

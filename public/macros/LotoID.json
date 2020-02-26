@@ -5,14 +5,8 @@
             {
                 "button": "a",
                 "onTime": 100,
-                "offTime": 600,
-                "count": 1
-            },
-            {
-                "button": "a",
-                "onTime": 100,
-                "offTime": 200,
-                "count": 1
+                "offTime": 1000,
+                "count": 2
             },
             {
                 "button": "down",
@@ -23,32 +17,44 @@
             {
                 "button": "a",
                 "onTime": 100,
-                "offTime": 600,
-                "count": 6
-            },
-            {
-                "button": "a",
-                "onTime": 100,
-                "offTime": 1000,
+                "offTime": 2000,
                 "count": 1
             },
             {
                 "button": "a",
                 "onTime": 100,
-                "offTime": 600,
+                "offTime": 1000,
                 "count": 2
             },
             {
                 "button": "a",
                 "onTime": 100,
-                "offTime": 1000,
+                "offTime": 2000,
+                "count": 4
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 3000,
                 "count": 1
             },
             {
                 "button": "a",
                 "onTime": 100,
-                "offTime": 600,
-                "count": 8
+                "offTime": 1000,
+                "count": 3
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 3000,
+                "count": 1
+            },
+            {
+                "button": "a",
+                "onTime": 100,
+                "offTime": 1000,
+                "count": 3
             }
         ],
         "count": 1

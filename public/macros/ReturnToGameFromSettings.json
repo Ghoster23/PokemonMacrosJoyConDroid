@@ -1,0 +1,14 @@
+[
+    {
+        "name": "Return to Game",
+        "macro": [
+            {
+                "button": "home",
+                "onTime": 100,
+                "offTime": 1000,
+                "count": 2
+            }
+        ],
+        "count": 1
+    }
+]
