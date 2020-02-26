@@ -75,7 +75,6 @@ function KeyLog(props) {
 	);
 }
 
-/*
 class CheckBox extends React.Component {
 	constructor(props) {
 		super(props);
@@ -85,7 +84,7 @@ class CheckBox extends React.Component {
 	}
 
 	handleChange(event) {
-		this.props.onChange(event.target.checked);
+		return this.props.onChange(this.props.paramKey, event.target.checked);
 	}
 
 	render() {
@@ -94,7 +93,6 @@ class CheckBox extends React.Component {
 		);
 	}
 }
-*/
 
 class DateInput extends React.Component {
 	constructor(props) {
@@ -174,7 +172,7 @@ class ParameterInput extends React.Component {
 								<DateInput id = "startDate" name = "start-date"
 									date = {params.startDate}
 									onChange = {date => this.props.eventHandler("startDate", date)}
-									/>
+								/>
 							</div>
 						</div>
 						<div className = "parameters-entry">
@@ -185,7 +183,7 @@ class ParameterInput extends React.Component {
 								<DateInput id = "endDate" name = "end-date"
 									date = {params.endDate}
 									onChange = {date => this.props.eventHandler("endDate", date)}
-									/>
+								/>
 							</div>
 						</div>
 						<div className = "parameters-entry">
@@ -197,15 +195,50 @@ class ParameterInput extends React.Component {
 									value = {params.daysToAdvance}
 									onChange = {value => this.props.eventHandler("daysToAdvance", value)}
 									min = "1" max = "10000"
-									/>
+								/>
 							</div>
 						</div>
 					</div>
 				);
 
-			case 1:
+			case "Loto ID":
 				return (
-					<div className = "macro-parameters" id = "TimeSkipParams">
+					<div className = "macro-parameters" id = "LottoIDParams">
+						<div className = "parameters-entry">
+							<label className = "parameter-label">
+								First Day Loto
+							</label>
+							<div className = "parameter">
+								<CheckBox id = "firstDayLoto" name = "first-day-loto"
+									checked = {params.getFirst}
+									paramKey = "getFirst"
+									onChange = {this.props.eventHandler}
+								/>
+							</div>
+						</div>
+						<div className = "parameters-entry">
+							<label className = "parameter-label">
+								Start Date
+							</label>
+							<div className = "parameter">
+								<DateInput id = "startDate" name = "start-date"
+									date = {params.startDate}
+									onChange = {date => this.props.eventHandler("startDate", date)}
+								/>
+							</div>
+						</div>
+						<div className = "parameters-entry">
+							<label className = "parameter-label">
+								Attempts
+							</label>
+							<div className = "parameter">
+								<IntegerInput id = "Attempts" name = "lotto-id-attempts"
+									value = {params.attempts}
+									onChange = {value => this.props.eventHandler("attempts", value)}
+									min = "0" max = "10000"
+								/>
+							</div>
+						</div>
 					</div>
 				);
 
@@ -358,7 +391,8 @@ class JSONManeger {
 			AdvMonth  : "AdvanceMonth.json",
 			AdvYear   : "AdvanceYear.json",
 			AdvYearLp : "AdvanceYearLeap.json",
-			AdvDec    : "AdvanceDecember.json"
+			AdvDec    : "AdvanceDecember.json",
+			LotoID    : "LotoID.json"
 		};
 
 		this.loaded = {
@@ -370,14 +404,15 @@ class JSONManeger {
 			AdvYear   : "",
 			AdvDec    : "",
 			AdvYearLp : "",
-			count     :  8
+			LotoID    : "",
+			count     :  9
 		};
 
 		this.loadedCount = 0;
 		this.loadConcluded = false;
 
 		var keys = ["FstSkipD", "FstSkipM", "FstSkipY", "AdvDay",
-		"AdvMonth", "AdvYear", "AdvYearLp", "AdvDec"];
+		"AdvMonth", "AdvYear", "AdvYearLp", "AdvDec", "LotoID"];
 
 		for(var k in keys) {
 			this.loadMacro(keys[k]);
@@ -465,8 +500,6 @@ class TimeSkipMacroBuilder extends MacroBuilder {
 			endDate   : this.onEndDateChange,
 			daysToAdvance : this.onDaysToAdvanceChange
 		};
-
-		this.currentDate = 0;
 	}
 
 	// Parameter Handlers
@@ -559,9 +592,9 @@ class TimeSkipMacroBuilder extends MacroBuilder {
 
 	InitMacro(startDate, currentDate) {
 		// If the day after the start is in the next Month
-		if(startDate.month < this.currentDate.month) {
+		if(startDate.month < currentDate.month) {
 			// If the day after the start is in the next Year
-			if(startDate.year < this.currentDate.year) {
+			if(startDate.year < currentDate.year) {
 				this.concatToMacro(this.getMacro("FstSkipY"));  // Advance the Day, Month and Year
 			}
 
@@ -675,7 +708,7 @@ class TimeSkipMacroBuilder extends MacroBuilder {
 
 			// Any other Month
 			else {
-				daysToGo = this.currentDate.daysToNextMonth();
+				daysToGo = currentDate.daysToNextMonth();
 
 				this.concatToMacro(this.AdvanceMonth(daysToGo));
 
@@ -699,6 +732,111 @@ class TimeSkipMacroBuilder extends MacroBuilder {
 		// While End Date has not been reached
 		while(currentDate.compare(endDate) > 0) {
 			this.NextMacroSegment(currentDate, endDate);
+		}
+
+		this.macro = new Macro(this.name, this.icon, this.macroJSON);
+
+		return this.macro;
+	}
+}
+
+class LotoIDMacroBuilder extends MacroBuilder {
+	constructor(jsonM) {
+		super(jsonM, "Loto ID", "./images/lotoid_icon.png");
+
+		// Init Parameters
+		var today    = new Date();
+
+		this.parameters.startDate = ConvertDate(today);
+		this.parameters.attempts  = 0;
+		this.parameters.getFirst  = true;
+
+		this.onStartDateChange = this.onStartDateChange.bind(this);
+		this.onAttemptsChange = this.onAttemptsChange.bind(this);
+		this.onGetFirstChange = this.onGetFirstChange.bind(this);
+
+		this.paramHandlers = {
+			startDate : this.onStartDateChange,
+			attempts  : this.onAttemptsChange,
+			getFirst  : this.onGetFirstChange
+		};
+	}
+
+	// Parameter Handlers
+	onStartDateChange(newDate) {
+		if(this.parameters.startDate !== newDate) {
+			this.parameters.startDate = newDate;
+
+			return true;
+		}
+
+		return false;
+	}
+
+	onAttemptsChange(count) {
+		if(this.parameters.attempts !== count) {
+			this.parameters.attempts = count;
+
+			return true;
+		}
+
+		return false;
+	}
+
+	onGetFirstChange(bool) {
+		if(this.parameters.getFirst !== bool) {
+			this.parameters.getFirst = bool;
+
+			return true;
+		}
+
+		return false;
+	}
+
+	// Build Macro
+	AdvanceDate(currentDate) {
+		var tomorrow = new SimpleDate(currentDate.toString());
+		tomorrow.increment(1);
+
+		// If the day after the start is in the next Month
+		if(currentDate.month < tomorrow.month) {
+			// If the day after the start is in the next Year
+			if(currentDate.year < tomorrow.year) {
+				this.concatToMacro(this.getMacro("FstSkipY"));  // Advance the Day, Month and Year
+			}
+
+			// It is in the same Year
+			else {
+				this.concatToMacro(this.getMacro("FstSkipM"));  // Advance the Day and Month
+			}
+		}
+
+		// It is in the same Month
+		else {
+			this.concatToMacro(this.getMacro("FstSkipD"));
+		}
+	}
+
+	build() {
+		if(!this.jsonManager.loadConcluded) return null;
+
+		this.macroJSON = []; // Clear Macro JSON
+
+		var currentDate = new SimpleDate(this.parameters.startDate);
+
+		var endDate = new SimpleDate(this.parameters.startDate);
+		endDate.increment(this.parameters.attempts);
+
+		if(this.parameters.getFirst) {
+			this.concatToMacro(this.getMacro("LotoID"));
+		}
+
+		// While End Date has not been reached
+		while(currentDate.compare(endDate) > 0) {
+			this.AdvanceDate(currentDate);
+			currentDate.increment(1);
+
+			this.concatToMacro(this.getMacro("LotoID"));
 		}
 
 		this.macro = new Macro(this.name, this.icon, this.macroJSON);
@@ -997,13 +1135,8 @@ class MacroPlayer {
 		// Create Macro Builders
 		this.builders = [];
 		this.builders[0] = new TimeSkipMacroBuilder(this.jsonManager);
-		this.builders[1] = new TimeSkipMacroBuilder(this.jsonManager);
-		this.builders[2] = new TimeSkipMacroBuilder(this.jsonManager);
-		this.builders[3] = new TimeSkipMacroBuilder(this.jsonManager);
-		this.builders[4] = new TimeSkipMacroBuilder(this.jsonManager);
-		this.builders[5] = new TimeSkipMacroBuilder(this.jsonManager);
-		this.builders[6] = new TimeSkipMacroBuilder(this.jsonManager);
-
+		this.builders[1] = new LotoIDMacroBuilder(this.jsonManager);
+		
 		let macroCount = this.builders.length;
 
 		// Init Dirty Bit Array
