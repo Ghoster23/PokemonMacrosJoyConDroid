@@ -17,44 +17,8 @@
             {
                 "button": "a",
                 "onTime": 100,
-                "offTime": 2000,
-                "count": 1
-            },
-            {
-                "button": "a",
-                "onTime": 100,
-                "offTime": 1000,
-                "count": 2
-            },
-            {
-                "button": "a",
-                "onTime": 100,
-                "offTime": 2000,
-                "count": 4
-            },
-            {
-                "button": "a",
-                "onTime": 100,
-                "offTime": 3000,
-                "count": 1
-            },
-            {
-                "button": "a",
-                "onTime": 100,
-                "offTime": 1000,
-                "count": 3
-            },
-            {
-                "button": "a",
-                "onTime": 100,
-                "offTime": 3000,
-                "count": 1
-            },
-            {
-                "button": "a",
-                "onTime": 100,
-                "offTime": 1000,
-                "count": 3
+                "offTime": 400,
+                "count": 30
             }
         ],
         "count": 1
