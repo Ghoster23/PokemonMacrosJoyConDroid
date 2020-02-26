@@ -1,5 +1,6 @@
 [
     {
+        "name": "Advance to Last of Month",
         "macro": [
             {
                 "button": "a",
@@ -35,6 +36,7 @@
         "count": 30
     },
     {
+        "name": "Advance to 1st of Month",
         "macro": [
             {
                 "button": "a",

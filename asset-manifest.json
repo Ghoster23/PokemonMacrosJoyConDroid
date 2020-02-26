@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.css": "/PokemonMacrosJoyConDroid/static/css/main.4af99af4.chunk.css",
-    "main.js": "/PokemonMacrosJoyConDroid/static/js/main.98ff0d3e.chunk.js",
-    "main.js.map": "/PokemonMacrosJoyConDroid/static/js/main.98ff0d3e.chunk.js.map",
+    "main.css": "/PokemonMacrosJoyConDroid/static/css/main.a42575be.chunk.css",
+    "main.js": "/PokemonMacrosJoyConDroid/static/js/main.c56bec4e.chunk.js",
+    "main.js.map": "/PokemonMacrosJoyConDroid/static/js/main.c56bec4e.chunk.js.map",
     "runtime-main.js": "/PokemonMacrosJoyConDroid/static/js/runtime-main.ad906206.js",
     "runtime-main.js.map": "/PokemonMacrosJoyConDroid/static/js/runtime-main.ad906206.js.map",
-    "static/js/2.9e70c351.chunk.js": "/PokemonMacrosJoyConDroid/static/js/2.9e70c351.chunk.js",
-    "static/js/2.9e70c351.chunk.js.map": "/PokemonMacrosJoyConDroid/static/js/2.9e70c351.chunk.js.map",
+    "static/js/2.0ac95d66.chunk.js": "/PokemonMacrosJoyConDroid/static/js/2.0ac95d66.chunk.js",
+    "static/js/2.0ac95d66.chunk.js.map": "/PokemonMacrosJoyConDroid/static/js/2.0ac95d66.chunk.js.map",
     "index.html": "/PokemonMacrosJoyConDroid/index.html",
-    "precache-manifest.702c00e3275db7b25676d4eb311bc3b9.js": "/PokemonMacrosJoyConDroid/precache-manifest.702c00e3275db7b25676d4eb311bc3b9.js",
+    "precache-manifest.b2b694cc91d8cfbe2087c6f427364460.js": "/PokemonMacrosJoyConDroid/precache-manifest.b2b694cc91d8cfbe2087c6f427364460.js",
     "service-worker.js": "/PokemonMacrosJoyConDroid/service-worker.js",
-    "static/css/main.4af99af4.chunk.css.map": "/PokemonMacrosJoyConDroid/static/css/main.4af99af4.chunk.css.map",
-    "static/js/2.9e70c351.chunk.js.LICENSE": "/PokemonMacrosJoyConDroid/static/js/2.9e70c351.chunk.js.LICENSE"
+    "static/css/main.a42575be.chunk.css.map": "/PokemonMacrosJoyConDroid/static/css/main.a42575be.chunk.css.map",
+    "static/js/2.0ac95d66.chunk.js.LICENSE": "/PokemonMacrosJoyConDroid/static/js/2.0ac95d66.chunk.js.LICENSE"
   },
   "entrypoints": [
     "static/js/runtime-main.ad906206.js",
-    "static/js/2.9e70c351.chunk.js",
-    "static/css/main.4af99af4.chunk.css",
-    "static/js/main.98ff0d3e.chunk.js"
+    "static/js/2.0ac95d66.chunk.js",
+    "static/css/main.a42575be.chunk.css",
+    "static/js/main.c56bec4e.chunk.js"
   ]
 }

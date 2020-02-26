@@ -1,5 +1,6 @@
 [
     {
+        "name": "Advance to last of December",
         "macro": [
             {
                 "button": "a",
@@ -35,6 +36,7 @@
         "count": 30
     },
     {
+        "name": "Advance to 1st of Year",
         "macro": [
             {
                 "button": "a",
