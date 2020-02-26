@@ -18,7 +18,13 @@
                 "button": "a",
                 "onTime": 100,
                 "offTime": 400,
-                "count": 40
+                "count": 21
+            },
+            {
+                "button": "b",
+                "onTime": 100,
+                "offTime": 400,
+                "count": 21
             }
         ],
         "count": 1
