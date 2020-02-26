@@ -30,7 +30,7 @@
                 "button"  : "down",
                 "onTime"  : 120,
                 "offTime" : 180,
-                "count"   : 16
+                "count"   : 14
             },
             {
                 "button"  : "a",

@@ -23,7 +23,7 @@
             {
                 "button"  : "a",
                 "onTime"  : 120,
-                "offTime" : 180,
+                "offTime" : 720,
                 "count"   : 1
             },
             {
@@ -31,6 +31,18 @@
                 "onTime"  : 120,
                 "offTime" : 180,
                 "count"   : 14
+            },
+            {
+                "button"  : "a",
+                "onTime"  : 120,
+                "offTime" : 600,
+                "count"   : 1
+            },
+            {
+                "button"  : "down",
+                "onTime"  : 120,
+                "offTime" : 180,
+                "count"   : 4
             },
             {
                 "button"  : "a",
