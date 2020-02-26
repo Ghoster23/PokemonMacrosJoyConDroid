@@ -4,103 +4,85 @@
         "macro": [
             {
                 "button"  : "home",
-                "onTime"  : 120,
-                "offTime" : 1200,
+                "onTime"  : 60,
+                "offTime" : 1000,
                 "count"   : 1
             },
             {
                 "button"  : "down",
-                "onTime"  : 120,
-                "offTime" : 180,
+                "onTime"  : 60,
+                "offTime" : 120,
                 "count"   : 1
             },
             {
                 "button"  : "right",
-                "onTime"  : 120,
-                "offTime" : 180,
+                "onTime"  : 60,
+                "offTime" : 120,
                 "count"   : 4
             },
             {
                 "button"  : "a",
-                "onTime"  : 120,
+                "onTime"  : 60,
                 "offTime" : 720,
                 "count"   : 1
             },
             {
                 "button"  : "down",
-                "onTime"  : 120,
-                "offTime" : 180,
+                "onTime"  : 60,
+                "offTime" : 120,
                 "count"   : 14
             },
             {
                 "button"  : "a",
-                "onTime"  : 120,
+                "onTime"  : 60,
                 "offTime" : 600,
                 "count"   : 1
             },
             {
                 "button"  : "down",
-                "onTime"  : 120,
-                "offTime" : 180,
+                "onTime"  : 60,
+                "offTime" : 120,
                 "count"   : 4
             },
             {
                 "button"  : "a",
-                "onTime"  : 120,
+                "onTime"  : 60,
                 "offTime" : 600,
                 "count"   : 3
             },
             {
                 "button"  : "down",
-                "onTime"  : 120,
-                "offTime" : 180,
+                "onTime"  : 60,
+                "offTime" : 120,
                 "count"   : 2
             },
             {
                 "button"  : "a",
-                "onTime"  : 120,
+                "onTime"  : 60,
                 "offTime" : 240,
                 "count"   : 1
             },
             {
+                "button"  : "right",
+                "onTime"  : 60,
+                "offTime" : 120,
+                "count"   : 2
+            },
+            {
                 "button"  : "up",
-                "onTime"  : 120,
-                "offTime" : 180,
+                "onTime"  : 60,
+                "offTime" : 120,
                 "count"   : 1
             },
             {
                 "button"  : "right",
-                "onTime"  : 120,
-                "offTime" : 180,
-                "count"   : 1
-            },
-            {
-                "button"  : "up",
-                "onTime"  : 120,
-                "offTime" : 180,
-                "count"   : 1
-            },
-            {
-                "button"  : "right",
-                "onTime"  : 120,
-                "offTime" : 180,
-                "count"   : 1
-            },
-            {
-                "button"  : "up",
-                "onTime"  : 120,
-                "offTime" : 180,
-                "count"   : 1
-            },
-            {
-                "button"  : "right",
-                "onTime"  : 120,
-                "offTime" : 180,
+                "onTime"  : 60,
+                "offTime" : 120,
                 "count"   : 3
             },
             {
                 "button"  : "a",
-                "onTime"  : 120,
+                "onTime"  : 60,
                 "offTime" : 600,
                 "count"   : 1
             }

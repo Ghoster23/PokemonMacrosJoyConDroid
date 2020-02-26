@@ -5,7 +5,7 @@
             {
                 "button": "a",
                 "onTime": 100,
-                "offTime": 1000,
+                "offTime": 600,
                 "count": 2
             },
             {
