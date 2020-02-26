@@ -18,13 +18,13 @@
                 "button": "a",
                 "onTime": 100,
                 "offTime": 400,
-                "count": 21
+                "count": 20
             },
             {
                 "button": "b",
                 "onTime": 100,
                 "offTime": 400,
-                "count": 21
+                "count": 20
             }
         ],
         "count": 1

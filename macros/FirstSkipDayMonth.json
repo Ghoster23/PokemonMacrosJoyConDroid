@@ -4,79 +4,79 @@
         "macro": [
             {
                 "button"  : "home",
-                "onTime"  : 100,
-                "offTime" : 1000,
+                "onTime"  : 120,
+                "offTime" : 1200,
                 "count"   : 1
             },
             {
                 "button"  : "down",
-                "onTime"  : 100,
-                "offTime" : 200,
+                "onTime"  : 120,
+                "offTime" : 180,
                 "count"   : 1
             },
             {
                 "button"  : "right",
-                "onTime"  : 100,
-                "offTime" : 200,
+                "onTime"  : 120,
+                "offTime" : 180,
                 "count"   : 4
             },
             {
                 "button"  : "a",
-                "onTime"  : 100,
-                "offTime" : 200,
+                "onTime"  : 120,
+                "offTime" : 180,
                 "count"   : 1
             },
             {
                 "button"  : "down",
-                "onTime"  : 100,
-                "offTime" : 200,
-                "count"   : 14
+                "onTime"  : 120,
+                "offTime" : 180,
+                "count"   : 16
             },
             {
                 "button"  : "a",
-                "onTime"  : 100,
-                "offTime" : 500,
+                "onTime"  : 120,
+                "offTime" : 600,
                 "count"   : 1
             },
             {
                 "button"  : "down",
-                "onTime"  : 100,
-                "offTime" : 200,
+                "onTime"  : 120,
+                "offTime" : 180,
                 "count"   : 2
             },
             {
                 "button"  : "a",
-                "onTime"  : 100,
-                "offTime" : 500,
+                "onTime"  : 120,
+                "offTime" : 240,
                 "count"   : 1
             },
             {
                 "button"  : "up",
-                "onTime"  : 100,
-                "offTime" : 200,
+                "onTime"  : 120,
+                "offTime" : 180,
                 "count"   : 1
             },
             {
                 "button"  : "right",
-                "onTime"  : 100,
-                "offTime" : 200,
+                "onTime"  : 120,
+                "offTime" : 180,
                 "count"   : 1
             },
             {
                 "button"  : "up",
-                "onTime"  : 100,
-                "offTime" : 200,
+                "onTime"  : 120,
+                "offTime" : 180,
                 "count"   : 1
             },
             {
                 "button"  : "right",
-                "onTime"  : 100,
-                "offTime" : 200,
+                "onTime"  : 120,
+                "offTime" : 180,
                 "count"   : 4
             },
             {
                 "button"  : "a",
-                "onTime"  : 100,
+                "onTime"  : 120,
                 "offTime" : 600,
                 "count"   : 1
             }
