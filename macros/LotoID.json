@@ -4,9 +4,15 @@
         "macro": [
             {
                 "button": "a",
-                "onTime": 100,
+                "onTime": 120,
+                "offTime": 800,
+                "count": 1
+            },
+            {
+                "button": "a",
+                "onTime": 120,
                 "offTime": 600,
-                "count": 2
+                "count": 1
             },
             {
                 "button": "down",
