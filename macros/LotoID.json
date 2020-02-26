@@ -17,7 +17,7 @@
             {
                 "button": "down",
                 "onTime": 100,
-                "offTime": 1000,
+                "offTime": 200,
                 "count": 1
             },
             {
@@ -36,7 +36,7 @@
                 "button": "a",
                 "onTime": 100,
                 "offTime": 1000,
-                "count": 2
+                "count": 1
             },
             {
                 "button": "a",
