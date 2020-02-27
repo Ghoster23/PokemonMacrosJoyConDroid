@@ -219,17 +219,6 @@ class ParameterInput extends React.Component {
 						</div>
 						<div className = "parameters-entry">
 							<label className = "parameter-label">
-								Start Date
-							</label>
-							<div className = "parameter">
-								<DateInput id = "startDate" name = "start-date"
-									date = {params.startDate}
-									onChange = {date => this.props.eventHandler("startDate", date)}
-								/>
-							</div>
-						</div>
-						<div className = "parameters-entry">
-							<label className = "parameter-label">
 								Attempts
 							</label>
 							<div className = "parameter">
@@ -394,7 +383,8 @@ class JSONManeger {
 			AdvYearLp : "AdvanceYearLeap.json",
 			AdvDec    : "AdvanceDecember.json",
 			LotoID    : "LotoID.json",
-			Return    : "ReturnToGameFromSettings.json"
+			Return    : "ReturnToGameFromSettings.json",
+			Universal : "UniversalSkip.json"
 		};
 
 		this.loaded = {
@@ -408,14 +398,16 @@ class JSONManeger {
 			AdvYearLp : "",
 			LotoID    : "",
 			Return    : "",
-			count     : 10
+			Universal : "",
+			count     : 11
 		};
 
 		this.loadedCount = 0;
 		this.loadConcluded = false;
 
 		var keys = ["FstSkipD", "FstSkipM", "FstSkipY", "AdvDay",
-		"AdvMonth", "AdvYear", "AdvYearLp", "AdvDec", "LotoID", "Return"];
+		"AdvMonth", "AdvYear", "AdvYearLp", "AdvDec", "LotoID", "Return",
+		"Universal"];
 
 		for(var k in keys) {
 			this.loadMacro(keys[k]);
@@ -749,35 +741,19 @@ class LotoIDMacroBuilder extends MacroBuilder {
 	constructor(jsonM) {
 		super(jsonM, "Loto ID", "./images/lotoid_icon.png");
 
-		// Init Parameters
-		var today    = new Date();
-
-		this.parameters.startDate = ConvertDate(today);
 		this.parameters.attempts  = 0;
 		this.parameters.getFirst  = true;
 
-		this.onStartDateChange = this.onStartDateChange.bind(this);
 		this.onAttemptsChange = this.onAttemptsChange.bind(this);
 		this.onGetFirstChange = this.onGetFirstChange.bind(this);
 
 		this.paramHandlers = {
-			startDate : this.onStartDateChange,
 			attempts  : this.onAttemptsChange,
 			getFirst  : this.onGetFirstChange
 		};
 	}
 
 	// Parameter Handlers
-	onStartDateChange(newDate) {
-		if(this.parameters.startDate !== newDate) {
-			this.parameters.startDate = newDate;
-
-			return true;
-		}
-
-		return false;
-	}
-
 	onAttemptsChange(count) {
 		if(this.parameters.attempts !== count) {
 			this.parameters.attempts = count;
@@ -827,19 +803,18 @@ class LotoIDMacroBuilder extends MacroBuilder {
 
 		this.macroJSON = []; // Clear Macro JSON
 
-		var currentDate = new SimpleDate(this.parameters.startDate);
-
-		var endDate = new SimpleDate(this.parameters.startDate);
-		endDate.increment(this.parameters.attempts);
+		var counter = 0;
 
 		if(this.parameters.getFirst) {
 			this.concatToMacro(this.getMacro("LotoID"));
+
+			counter = 1;
 		}
 
 		// While End Date has not been reached
-		while(currentDate.compare(endDate) > 0) {
-			this.AdvanceDate(currentDate);
-			currentDate.increment(1);
+		while(counter < this.parameters.attempts) {
+			this.concatToMacro(this.getMacro("Universal"));
+			counter++;
 
 			this.concatToMacro(this.getMacro("Return"));
 

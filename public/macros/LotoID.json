@@ -4,9 +4,15 @@
         "macro": [
             {
                 "button": "a",
-                "onTime": 100,
-                "offTime": 1000,
-                "count": 2
+                "onTime": 120,
+                "offTime": 800,
+                "count": 1
+            },
+            {
+                "button": "a",
+                "onTime": 120,
+                "offTime": 600,
+                "count": 1
             },
             {
                 "button": "down",
@@ -17,44 +23,14 @@
             {
                 "button": "a",
                 "onTime": 100,
-                "offTime": 2000,
-                "count": 1
+                "offTime": 400,
+                "count": 16
             },
             {
-                "button": "a",
+                "button": "b",
                 "onTime": 100,
-                "offTime": 1000,
-                "count": 2
-            },
-            {
-                "button": "a",
-                "onTime": 100,
-                "offTime": 2000,
-                "count": 4
-            },
-            {
-                "button": "a",
-                "onTime": 100,
-                "offTime": 3000,
-                "count": 1
-            },
-            {
-                "button": "a",
-                "onTime": 100,
-                "offTime": 1000,
-                "count": 3
-            },
-            {
-                "button": "a",
-                "onTime": 100,
-                "offTime": 3000,
-                "count": 1
-            },
-            {
-                "button": "a",
-                "onTime": 100,
-                "offTime": 1000,
-                "count": 3
+                "offTime": 400,
+                "count": 20
             }
         ],
         "count": 1
