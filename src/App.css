@@ -66,6 +66,7 @@ html, body {
     flex-shrink: 0;
     box-shadow: 0px 0.6vh 1.2vh -0.4vh #2a2a2a;
     transition: background-color .2s linear;
+    cursor: pointer;
 }
 
 .macro-button-label {
@@ -228,4 +229,53 @@ html, body {
     border-radius: 50%;
     flex-shrink: 0;
     box-shadow: 0px 0.6vh 1.2vh -0.4vh #2a2a2a;
+    cursor: pointer;
+}
+
+#InfoButton {
+  background-color: #FFFFFF;
+  color: black;
+  width: 100%;
+  height: 3vh;
+  border: none;
+  border-radius: 1.5vh;
+  flex-shrink: 0;
+  box-shadow: 0px 0.6vh 1.2vh -0.4vh #2a2a2a;
+  transition: background-color .2s linear;
+  cursor: pointer;
+  margin: 1vh auto 0vh auto;
+  font-size: 2vh;
+}
+
+.info-overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  justify-content: center;
+  align-items: center;
+  width: 100%; /* Full width (cover the whole page) */
+  height:100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.1); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
+
+.infoTextTitle {
+  text-align: center;
+}
+
+.infoSectionParagraph {
+  font-size: 1.5vh;
+}
+
+.text-box {
+  background-color: #FFFFFF;
+  width: 70%;
+  height: max-content;
+  padding: 5% 5%;
+  color: #000;
+  overflow: hidden;
 }

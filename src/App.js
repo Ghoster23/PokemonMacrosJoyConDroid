@@ -152,7 +152,7 @@ class ParameterInput extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.state = {active : false, locked : false};
+		this.state = {active : false};
 	}
 
 	render() {
@@ -238,6 +238,44 @@ class ParameterInput extends React.Component {
 					</div>
 				);
 		}
+	}
+}
+
+class InfoOverlay extends React.Component {
+	constructor(props) {
+		super(props);
+
+		this.state = {};
+	}
+
+	render() {
+		var display_style = {display : "none"};
+		if(this.props.show) display_style.display = "flex";
+
+		var sections = [];
+
+		var i = 0;
+		for(; i < this.props.sections.length; i++) {
+			var section = this.props.sections[i];
+
+			sections[i] = (
+				<div className = "infoSection" key = {"infoSect_" + i.toString()}>
+					<h2 className = "infoSectionTitle"> {section.title} </h2>
+					<p className = "infoSectionParagraph"> {section.text} </p>
+				</div>
+			);
+		}
+
+		return (
+			<div id = "infoOverlay" className = "info-overlay" style = {display_style}
+				onMouseDown  = {this.props.onMouseDown}
+				onTouchStart = {this.props.onTouchStart}>
+				<div id = "infoTextBox" className = "text-box">
+					<h1 className = "infoTextTitle"> {this.props.title} </h1>
+						{sections}
+				</div>
+			</div>
+		);
 	}
 }
 
@@ -445,6 +483,8 @@ class MacroBuilder {
 
 		this.parameters = {};
 		this.paramHandlers = {};
+
+		this.info = [];
 	}
 
 	changeParameter(key, value) {
@@ -468,7 +508,8 @@ class MacroBuilder {
 		return {
 			name : this.name,
 			icon : this.icon,
-			parameters : this.parameters
+			parameters : this.parameters,
+			info : this.info
 		};
 	}
 }
@@ -495,6 +536,37 @@ class TimeSkipMacroBuilder extends MacroBuilder {
 			endDate   : this.onEndDateChange,
 			daysToAdvance : this.onDaysToAdvanceChange
 		};
+
+		var text1 = (
+			<p>
+				<b>1-</b> In the <b>Console Settings</b>, turn <b>Synchronize Time</b> off.
+				<br/>
+				<br/>
+				<b>2-</b> The <b>Date</b> in <b>Console Settings</b> and <b>Start Date</b> must match.
+				<br/>
+				<br/>
+				<b>3-</b>
+				<br/>
+				<b>3.1-</b> Set <b>End Date</b> to the date you want to reach.
+				<br/>
+				<br/>
+				<b>OR</b>
+				<br/>
+				<br/>
+				<b>3.2-</b> Set <b>Skip Count</b> to the number of days to advance.
+			</p>
+		);
+
+		this.info = [
+			{
+				title: "SetUp",
+				text: text1
+			},
+			{
+				title: "Recommendations",
+				text: "Avoid doing many skips in the Wild Area as this is known to sometimes result in game crashes. Use this macro indoors."
+			}
+		];
 	}
 
 	// Parameter Handlers
@@ -751,6 +823,25 @@ class LotoIDMacroBuilder extends MacroBuilder {
 			attempts  : this.onAttemptsChange,
 			getFirst  : this.onGetFirstChange
 		};
+
+		var text1 = (
+			<p>
+				<b>1-</b> Position the character in front of the PC, facing it.
+				<br/>
+				<br/>
+				<b>2-</b> Check the <b>First Day Loto</b> box only if you have the Loto still available.
+				<br/>
+				<br/>
+				<b>3-</b> Set <b>Attempts</b> to how many times you want to try the Loto.
+			</p>
+		);
+
+		this.info = [
+			{
+				title: "SetUp",
+				text: text1
+			}
+		];
 	}
 
 	// Parameter Handlers
@@ -1359,7 +1450,7 @@ class App extends Component {
 		this.state = {selectedMacro :  0,
 					  macroState    : -1,
 					  macroProgress :  0,
-					  locked        : false
+						displayInfo   : false
 		};
 	}
 
@@ -1410,6 +1501,10 @@ class App extends Component {
 				if(this.macroPlayer.reset()) {
 					this.keyLogger.clear();
 				}
+			break;
+
+			case "info":
+				this.setState({displayInfo: pressed});
 			break;
 		}
 
@@ -1531,12 +1626,33 @@ class App extends Component {
 		);
 	}
 
+	renderInfo() {
+		let data = this.macroPlayer.getCurrentMacroData();
+		let name = data.name;
+		let info = data.info;
+
+		return (
+			<div id = "Info">
+				<button className = "info-button" id = "InfoButton"
+					onMouseDown  = {e => this.onButtonEvent("info", true)}
+					onTouchStart = {e => this.onButtonEvent("info", true)}>
+					Info
+				</button>
+				<InfoOverlay show = {this.state.displayInfo}
+					title = {name} sections = {info}
+					onMouseDown  = {e => this.onButtonEvent("info", false)}
+					onTouchStart = {e => this.onButtonEvent("info", false)}/>
+			</div>
+		);
+	}
+
 	render() {
 		const pressed = this.keyLogger.renderPressed();
 		const logging = this.keyLogger.renderLogged();
 
 		const macros = this.renderMacros();
 		const parameters = this.renderParameters();
+		const info = this.renderInfo();
 
 		return (
 			<div className = "App" style = {{backgroundImage: "url(./images/background.png)"}}>
@@ -1547,10 +1663,11 @@ class App extends Component {
 				</div>
 				<div id = "body">
 					<div id = "Macros">
-							{macros}
+						{macros}
 					</div>
 					<div id = "Parameters">
-							{parameters}
+						{parameters}
+						{info}
 					</div>
 					<div id = "Tracker">
 						<ProgressBar key = "progressbar" percentage = {this.state.macroProgress} />
