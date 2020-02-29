@@ -1,0 +1,26 @@
+[
+    {
+        "name": "Conclude Wonder Trade",
+        "macro": [
+            {
+                "button"  : "a",
+                "onTime"  : 80,
+                "offTime" : 480,
+                "count"   : 2
+            },
+            {
+                "button"  : "a",
+                "onTime"  : 100,
+                "offTime" : 35000,
+                "count"   : 1
+            },
+            {
+                "button"  : "y",
+                "onTime"  : 100,
+                "offTime" : 25000,
+                "count"   : 1
+            }
+        ],
+        "count": 1
+    }
+]
