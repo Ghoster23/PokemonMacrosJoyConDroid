@@ -3,15 +3,15 @@
         "name": "Conclude Wonder Trade",
         "macro": [
             {
-                "button"  : "a",
+                "button"  : "buffer",
                 "onTime"  : 100,
-                "offTime" : 1000,
+                "offTime" : 1200,
                 "count"   : 1
             },
             {
                 "button"  : "a",
                 "onTime"  : 100,
-                "offTime" : 600,
+                "offTime" : 800,
                 "count"   : 2
             },
             {
