@@ -5,13 +5,13 @@
             {
                 "button"  : "a",
                 "onTime"  : 100,
-                "offTime" : 600,
+                "offTime" : 1000,
                 "count"   : 1
             },
             {
                 "button"  : "a",
                 "onTime"  : 100,
-                "offTime" : 480,
+                "offTime" : 600,
                 "count"   : 2
             },
             {
