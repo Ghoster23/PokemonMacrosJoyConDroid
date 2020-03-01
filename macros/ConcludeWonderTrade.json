@@ -4,8 +4,8 @@
         "macro": [
             {
                 "button"  : "buffer",
-                "onTime"  : 100,
-                "offTime" : 2000,
+                "onTime"  : 0,
+                "offTime" : 3000,
                 "count"   : 1
             },
             {
