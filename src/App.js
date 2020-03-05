@@ -22,8 +22,11 @@ function arrayFindIndex(array, toFind) {
 
 function ConvertDate(date) {
 	let day   = date.getDate().toString();
+	if(day <= 9) day = "0" + day;
+
 	let month = (date.getMonth() + 1).toString();
 	if(date.getMonth() < 9) month = "0" + month;
+
 	let year  = date.getFullYear().toString();
 
 	return year + "-" + month + "-" + day;
@@ -232,9 +235,33 @@ class ParameterInput extends React.Component {
 					</div>
 				);
 
-			case 2:
+			case "Wonder Box":
 				return (
-					<div className = "macro-parameters" id = "TimeSkipParams">
+					<div className = "macro-parameters" id = "WonderBoxParams">
+						<div className = "parameters-entry">
+							<label className = "parameter-label">
+								Count
+							</label>
+							<div className = "parameter">
+								<IntegerInput id = "WTradeCount" name = "wonder-trade-count"
+									value = {params.count}
+									onChange = {value => this.props.eventHandler("count", value)}
+									min = "1" max = "30"
+								/>
+							</div>
+						</div>
+						<div className = "parameters-entry">
+							<label className = "parameter-label">
+								Wait Time
+							</label>
+							<div className = "parameter">
+								<IntegerInput id = "WTradeWaitTime" name = "wonder-trade-wait-time"
+									value = {params.waitTime}
+									onChange = {value => this.props.eventHandler("waitTime", value)}
+									min = "2" max = "600"
+								/>
+							</div>
+						</div>
 					</div>
 				);
 		}
@@ -261,7 +288,7 @@ class InfoOverlay extends React.Component {
 			sections[i] = (
 				<div className = "infoSection" key = {"infoSect_" + i.toString()}>
 					<h2 className = "infoSectionTitle"> {section.title} </h2>
-					<p className = "infoSectionParagraph"> {section.text} </p>
+					{section.text}
 				</div>
 			);
 		}
@@ -412,32 +439,38 @@ class SimpleDate {
 class JSONManeger {
 	constructor() {
 		this.filenames = {
-			FstSkipD  : "FirstSkipDay.json",
-			FstSkipM  : "FirstSkipDayMonth.json",
-			FstSkipY  : "FirstSkipDayMonthYear.json",
-			AdvDay    : "AdvanceDay.json",
-			AdvMonth  : "AdvanceMonth.json",
-			AdvYear   : "AdvanceYear.json",
-			AdvYearLp : "AdvanceYearLeap.json",
-			AdvDec    : "AdvanceDecember.json",
-			LotoID    : "LotoID.json",
-			Return    : "ReturnToGameFromSettings.json",
-			Universal : "UniversalSkip.json"
+			FstSkipD    : "FirstSkipDay.json",
+			FstSkipM    : "FirstSkipDayMonth.json",
+			FstSkipY    : "FirstSkipDayMonthYear.json",
+			AdvDay      : "AdvanceDay.json",
+			AdvMonth    : "AdvanceMonth.json",
+			AdvYear     : "AdvanceYear.json",
+			AdvYearLp   : "AdvanceYearLeap.json",
+			AdvDec      : "AdvanceDecember.json",
+			LotoID      : "LotoID.json",
+			Return      : "ReturnToGameFromSettings.json",
+			Universal   : "UniversalSkip.json",
+			SelectInBox : "SelectInBox.json",
+			StartWonder : "StartWonderTrade.json",
+			EndWonder   : "ConcludeWonderTrade.json"
 		};
 
 		this.loaded = {
-			FstSkipD  : "",
-			FstSkipM  : "",
-			FstSkipY  : "",
-			AdvDay    : "",
-			AdvMonth  : "",
-			AdvYear   : "",
-			AdvDec    : "",
-			AdvYearLp : "",
-			LotoID    : "",
-			Return    : "",
-			Universal : "",
-			count     : 11
+			FstSkipD    : "",
+			FstSkipM    : "",
+			FstSkipY    : "",
+			AdvDay      : "",
+			AdvMonth    : "",
+			AdvYear     : "",
+			AdvDec      : "",
+			AdvYearLp   : "",
+			LotoID      : "",
+			Return      : "",
+			Universal   : "",
+			SelectInBox : "",
+			StartWonder : "",
+			EndWonder   : "",
+			count     : 14
 		};
 
 		this.loadedCount = 0;
@@ -445,7 +478,7 @@ class JSONManeger {
 
 		var keys = ["FstSkipD", "FstSkipM", "FstSkipY", "AdvDay",
 		"AdvMonth", "AdvYear", "AdvYearLp", "AdvDec", "LotoID", "Return",
-		"Universal"];
+		"Universal", "SelectInBox", "StartWonder", "EndWonder"];
 
 		for(var k in keys) {
 			this.loadMacro(keys[k]);
@@ -826,13 +859,16 @@ class LotoIDMacroBuilder extends MacroBuilder {
 
 		var text1 = (
 			<p>
-				<b>1-</b> Position the character in front of the PC, facing it.
+				<b>1-</b> In the <b>Console Settings</b>, turn <b>Synchronize Time</b> off.
 				<br/>
 				<br/>
-				<b>2-</b> Check the <b>First Day Loto</b> box only if you have the Loto still available.
+				<b>2-</b> Position the character in front of the PC, facing it.
 				<br/>
 				<br/>
-				<b>3-</b> Set <b>Attempts</b> to how many times you want to try the Loto.
+				<b>3-</b> Check the <b>First Day Loto</b> box only if you have the Loto still available.
+				<br/>
+				<br/>
+				<b>4-</b> Set <b>Attempts</b> to how many times you want to try the Loto.
 			</p>
 		);
 
@@ -910,6 +946,140 @@ class LotoIDMacroBuilder extends MacroBuilder {
 			this.concatToMacro(this.getMacro("Return"));
 
 			this.concatToMacro(this.getMacro("LotoID"));
+		}
+
+		this.macro = new Macro(this.name, this.icon, this.macroJSON);
+
+		return this.macro;
+	}
+}
+
+class WonderBoxMacroBuilder extends MacroBuilder {
+	constructor(jsonM) {
+		super(jsonM, "Wonder Box", "./images/wonderbox_icon.png");
+
+		this.parameters.count    = 1;
+		this.parameters.waitTime = 35;
+
+		this.onCountChange = this.onCountChange.bind(this);
+		this.onWaitTimeChange = this.onWaitTimeChange.bind(this);
+
+		this.paramHandlers = {
+			count  : this.onCountChange,
+			waitTime : this.onWaitTimeChange
+		};
+
+		var text1 = (
+			<p>
+				<b>1-</b> In-Game, open your PC and go to the box with the pokemon to be wonder traded.
+				<br/>
+				<br/>
+				<b>2-</b> Make sure there are no empty spots between pokemon.
+				The macro will start trading from the top left corner and go left to right, top to bottom.
+				<br/>
+				<br/>
+				<b>3-</b> Exit all menus.
+				<br/>
+				<br/>
+				<b>4-</b> Set the <b>Count</b> parameter to how many pokemon you want to trade away from that box.
+				<br/>
+				<br/>
+				<b>4-</b> Set the <b>Wait Time</b> parameter to how many <b>seconds</b> the macro should wait for the Wonder Trade to complete.
+			</p>
+		);
+
+		var text2 = (
+			<p>
+				When running this macro, the time for a trade to go through can vary a lot.
+				Because of this, you may need to adjust the <b>Wait Time</b>. It can go up to 10 minutes (600 s),
+				or as low as 2 seconds.
+				<br/>
+				If it is too erratic and you want to be more efficient, you can set the value relatively low and
+				press pause after the search for a trade starts and press play to resume the macro when you see
+				it has finished.
+				<br/>
+				<br/>
+				It is also very important to make sure you have the correct box selected at the start of the macro.
+			</p>
+		);
+
+		this.info = [
+			{
+				title: "SetUp",
+				text: text1
+			},
+			{
+				title: "Recommendations",
+				text: text2
+			}
+		];
+	}
+
+	// Parameter Handlers
+	onCountChange(count) {
+		if(this.parameters.count !== count) {
+			this.parameters.count = count;
+
+			return true;
+		}
+
+		return false;
+	}
+
+	onWaitTimeChange(time) {
+		if(this.parameters.waitTime !== time) {
+			this.parameters.waitTime = time;
+
+			return true;
+		}
+
+		return false;
+	}
+
+	// Build Macro
+	SelectInBox(row, column) {
+		var segments = this.getMacro("SelectInBox");
+
+		segments[0].macro[0].count = row;
+		segments[0].macro[1].count = column;
+
+		this.concatToMacro(segments);
+	}
+
+	ConcludeTrade() {
+		var segments = this.getMacro("EndWonder");
+
+		segments[0].macro[2].offTime = this.parameters.waitTime * 1000;
+
+		this.concatToMacro(segments);
+	}
+
+	build() {
+		if(!this.jsonManager.loadConcluded) return null;
+
+		this.macroJSON = []; // Clear Macro JSON
+
+		var count  = 0;
+		var row    = 0;
+		var column = 0;
+
+		for(; row < 5; row++) {
+			for(; column < 6; column++) {
+				this.concatToMacro(this.getMacro("StartWonder"));
+
+				this.SelectInBox(row, column);
+
+				this.ConcludeTrade();
+
+				count++;
+				if(count >= this.parameters.count) {
+					break;
+				}
+			}
+
+			if(count >= this.parameters.count) {
+				break;
+			}
 		}
 
 		this.macro = new Macro(this.name, this.icon, this.macroJSON);
@@ -1211,6 +1381,7 @@ class MacroPlayer {
 		this.builders = [];
 		this.builders[0] = new TimeSkipMacroBuilder(this.jsonManager);
 		this.builders[1] = new LotoIDMacroBuilder(this.jsonManager);
+		this.builders[2] = new WonderBoxMacroBuilder(this.jsonManager);
 
 		let macroCount = this.builders.length;
 

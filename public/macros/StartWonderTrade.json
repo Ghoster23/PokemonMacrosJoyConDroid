@@ -1,0 +1,26 @@
+[
+    {
+        "name": "Start Wonder Trade",
+        "macro": [
+            {
+                "button"  : "y",
+                "onTime"  : 80,
+                "offTime" : 1000,
+                "count"   : 1
+            },
+            {
+                "button"  : "down",
+                "onTime"  : 80,
+                "offTime" : 180,
+                "count"   : 1
+            },
+            {
+                "button"  : "a",
+                "onTime"  : 80,
+                "offTime" : 1800,
+                "count"   : 1
+            }
+        ],
+        "count": 1
+    }
+]

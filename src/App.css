@@ -263,12 +263,12 @@ html, body {
   cursor: pointer; /* Add a pointer on hover */
 }
 
-.infoTextTitle {
-  text-align: center;
+.infoSection {
+    font-size: 1.5vh;
 }
 
-.infoSectionParagraph {
-  font-size: 1.5vh;
+.infoTextTitle {
+  text-align: center;
 }
 
 .text-box {
