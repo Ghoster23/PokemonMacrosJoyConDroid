@@ -1,6 +1,6 @@
 [
     {
-        "name": "Advance to last of December",
+        "name": "Advance to Last of Month (US)",
         "macro": [
             {
                 "button": "a",
@@ -36,7 +36,7 @@
         "count": 30
     },
     {
-        "name": "Advance to 1st of Year",
+        "name": "Advance to 1st of Month",
         "macro": [
             {
                 "button": "a",
@@ -48,43 +48,31 @@
                 "button": "left",
                 "onTime": 100,
                 "offTime": 200,
+                "count": 6
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "up",
+                "onTime": 100,
+                "offTime": 200,
+                "count": 1
+            },
+            {
+                "button": "right",
+                "onTime": 100,
+                "offTime": 200,
                 "count": 5
-            },
-            {
-                "button": "up",
-                "onTime": 100,
-                "offTime": 200,
-                "count": 1
-            },
-            {
-                "button": "right",
-                "onTime": 100,
-                "offTime": 200,
-                "count": 1
-            },
-            {
-                "button": "up",
-                "onTime": 100,
-                "offTime": 200,
-                "count": 1
-            },
-            {
-                "button": "right",
-                "onTime": 100,
-                "offTime": 200,
-                "count": 1
-            },
-            {
-                "button": "up",
-                "onTime": 100,
-                "offTime": 200,
-                "count": 1
-            },
-            {
-                "button": "right",
-                "onTime": 100,
-                "offTime": 200,
-                "count": 3
             },
             {
                 "button": "a",

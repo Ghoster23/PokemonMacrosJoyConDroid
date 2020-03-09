@@ -1,94 +1,106 @@
 [
     {
-        "name": "Universal Skip",
+        "name": "First Day skip (Advance Month and Year US)",
         "macro": [
             {
                 "button"  : "home",
-                "onTime"  : 80,
-                "offTime" : 1000,
+                "onTime"  : 120,
+                "offTime" : 1200,
                 "count"   : 1
             },
             {
                 "button"  : "down",
-                "onTime"  : 80,
-                "offTime" : 120,
+                "onTime"  : 120,
+                "offTime" : 180,
                 "count"   : 1
             },
             {
                 "button"  : "right",
-                "onTime"  : 80,
+                "onTime"  : 120,
                 "offTime" : 180,
                 "count"   : 4
             },
             {
                 "button"  : "a",
-                "onTime"  : 80,
-                "offTime" : 600,
+                "onTime"  : 120,
+                "offTime" : 720,
                 "count"   : 1
             },
             {
                 "button"  : "down",
-                "onTime"  : 80,
-                "offTime" : 120,
-                "count"   : 15
+                "onTime"  : 120,
+                "offTime" : 180,
+                "count"   : 14
             },
             {
                 "button"  : "a",
-                "onTime"  : 80,
+                "onTime"  : 120,
                 "offTime" : 600,
                 "count"   : 1
             },
             {
                 "button"  : "down",
-                "onTime"  : 80,
-                "offTime" : 120,
+                "onTime"  : 120,
+                "offTime" : 180,
                 "count"   : 4
             },
             {
                 "button"  : "a",
-                "onTime"  : 80,
+                "onTime"  : 120,
                 "offTime" : 600,
-                "count"   : 3
+                "count"   : 1
             },
             {
                 "button"  : "down",
-                "onTime"  : 80,
-                "offTime" : 120,
+                "onTime"  : 120,
+                "offTime" : 180,
                 "count"   : 2
             },
             {
                 "button"  : "a",
-                "onTime"  : 80,
+                "onTime"  : 120,
                 "offTime" : 240,
                 "count"   : 1
             },
             {
-                "button"  : "right",
-                "onTime"  : 80,
-                "offTime" : 120,
-                "count"   : 2
-            },
-            {
                 "button"  : "up",
-                "onTime"  : 80,
-                "offTime" : 120,
-                "count"   : 1
-            },
-            {
-                "button"  : "right",
-                "onTime"  : 80,
-                "offTime" : 120,
-                "count"   : 2
-            },
-            {
-                "button"  : "right",
-                "onTime"  : 80,
+                "onTime"  : 120,
                 "offTime" : 180,
                 "count"   : 1
             },
             {
+                "button"  : "right",
+                "onTime"  : 120,
+                "offTime" : 180,
+                "count"   : 1
+            },
+            {
+                "button"  : "up",
+                "onTime"  : 120,
+                "offTime" : 180,
+                "count"   : 1
+            },
+            {
+                "button"  : "right",
+                "onTime"  : 120,
+                "offTime" : 180,
+                "count"   : 1
+            },
+            {
+                "button"  : "up",
+                "onTime"  : 120,
+                "offTime" : 180,
+                "count"   : 1
+            },
+            {
+                "button"  : "right",
+                "onTime"  : 120,
+                "offTime" : 180,
+                "count"   : 4
+            },
+            {
                 "button"  : "a",
-                "onTime"  : 80,
+                "onTime"  : 120,
                 "offTime" : 600,
                 "count"   : 1
             }

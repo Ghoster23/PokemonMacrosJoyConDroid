@@ -78,7 +78,7 @@
                 "button"  : "right",
                 "onTime"  : 80,
                 "offTime" : 120,
-                "count"   : 2
+                "count"   : 3
             },
             {
                 "button"  : "right",
