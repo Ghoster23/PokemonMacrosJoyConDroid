@@ -1,6 +1,6 @@
 [
     {
-        "name": "First Day skip (Advance Month US)",
+        "name": "First day skip US",
         "macro": [
             {
                 "button"  : "home",
@@ -11,13 +11,13 @@
             {
                 "button"  : "down",
                 "onTime"  : 120,
-                "offTime" : 180,
+                "offTime" : 120,
                 "count"   : 1
             },
             {
                 "button"  : "right",
                 "onTime"  : 120,
-                "offTime" : 180,
+                "offTime" : 120,
                 "count"   : 4
             },
             {
@@ -29,7 +29,7 @@
             {
                 "button"  : "down",
                 "onTime"  : 120,
-                "offTime" : 180,
+                "offTime" : 120,
                 "count"   : 14
             },
             {
@@ -41,7 +41,7 @@
             {
                 "button"  : "down",
                 "onTime"  : 120,
-                "offTime" : 180,
+                "offTime" : 120,
                 "count"   : 4
             },
             {
@@ -53,7 +53,7 @@
             {
                 "button"  : "down",
                 "onTime"  : 120,
-                "offTime" : 180,
+                "offTime" : 120,
                 "count"   : 2
             },
             {
@@ -63,27 +63,21 @@
                 "count"   : 1
             },
             {
-                "button"  : "up",
-                "onTime"  : 120,
-                "offTime" : 180,
-                "count"   : 1
-            },
-            {
                 "button"  : "right",
                 "onTime"  : 120,
-                "offTime" : 180,
+                "offTime" : 120,
                 "count"   : 1
             },
             {
                 "button"  : "up",
                 "onTime"  : 120,
-                "offTime" : 180,
+                "offTime" : 120,
                 "count"   : 1
             },
             {
                 "button"  : "right",
                 "onTime"  : 120,
-                "offTime" : 180,
+                "offTime" : 120,
                 "count"   : 5
             },
             {
