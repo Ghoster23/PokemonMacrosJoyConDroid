@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "fd6c80edcccda40e4d26cec7de0632c4",
+    "revision": "87f3f4119028b494e40f61df968ea40b",
     "url": "/PokemonMacrosJoyConDroid/index.html"
   },
   {
-    "revision": "15687828cc935ef8a9e4",
+    "revision": "d2a257e9e7580fc51609",
     "url": "/PokemonMacrosJoyConDroid/static/css/main.acbdd099.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/PokemonMacrosJoyConDroid/static/js/2.0ac95d66.chunk.js.LICENSE"
   },
   {
-    "revision": "15687828cc935ef8a9e4",
-    "url": "/PokemonMacrosJoyConDroid/static/js/main.0fce7e2b.chunk.js"
+    "revision": "d2a257e9e7580fc51609",
+    "url": "/PokemonMacrosJoyConDroid/static/js/main.d46bff0c.chunk.js"
   },
   {
     "revision": "8d0d80a8c1dbdb9c4fd6",

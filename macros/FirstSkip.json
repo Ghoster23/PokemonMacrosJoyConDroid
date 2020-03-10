@@ -52,7 +52,7 @@
             },
             {
                 "button"  : "down",
-                "onTime"  : 240,
+                "onTime"  : 600,
                 "offTime" : 120,
                 "count"   : 1
             },
