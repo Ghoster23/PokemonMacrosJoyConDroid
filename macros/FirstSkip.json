@@ -28,9 +28,9 @@
             },
             {
                 "button"  : "down",
-                "onTime"  : 120,
+                "onTime"  : 1680,
                 "offTime" : 120,
-                "count"   : 14
+                "count"   : 1
             },
             {
                 "button"  : "a",
@@ -52,9 +52,9 @@
             },
             {
                 "button"  : "down",
-                "onTime"  : 120,
+                "onTime"  : 240,
                 "offTime" : 120,
-                "count"   : 2
+                "count"   : 1
             },
             {
                 "button"  : "a",
@@ -70,9 +70,9 @@
             },
             {
                 "button"  : "right",
-                "onTime"  : 120,
+                "onTime"  : 600,
                 "offTime" : 120,
-                "count"   : 5
+                "count"   : 1
             },
             {
                 "button"  : "a",

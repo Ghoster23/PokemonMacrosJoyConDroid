@@ -10,9 +10,9 @@
             },
             {
                 "button": "left",
-                "onTime": 100,
+                "onTime": 500,
                 "offTime": 200,
-                "count": 5
+                "count": 1
             },
             {
                 "button": "up",
@@ -22,9 +22,9 @@
             },
             {
                 "button": "right",
-                "onTime": 100,
+                "onTime": 500,
                 "offTime": 200,
-                "count": 5
+                "count": 1
             },
             {
                 "button": "a",
