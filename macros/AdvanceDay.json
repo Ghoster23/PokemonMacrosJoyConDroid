@@ -10,7 +10,7 @@
             },
             {
                 "button"  : "left",
-                "onTime"  : 480,
+                "onTime"  : 600,
                 "offTime" : 240,
                 "count"   : 1
             },
