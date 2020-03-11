@@ -3,36 +3,36 @@
         "name": "Advance Day",
         "macro": [
             {
-                "button": "a",
-                "onTime": 100,
-                "offTime": 600,
-                "count": 1
+                "button"  : "a",
+                "onTime"  : 120,
+                "offTime" : 600,
+                "count"   : 1
             },
             {
-                "button": "left",
-                "onTime": 500,
-                "offTime": 200,
-                "count": 1
+                "button"  : "left",
+                "onTime"  : 480,
+                "offTime" : 240,
+                "count"   : 1
             },
             {
-                "button": "up",
-                "onTime": 100,
-                "offTime": 200,
-                "count": 1
+                "button"  : "up",
+                "onTime"  : 120,
+                "offTime" : 240,
+                "count"   : 1
             },
             {
-                "button": "right",
-                "onTime": 500,
-                "offTime": 200,
-                "count": 1
+                "button"  : "right",
+                "onTime"  : 600,
+                "offTime" : 200,
+                "count"   : 1
             },
             {
-                "button": "a",
-                "onTime": 100,
-                "offTime": 200,
-                "count": 1
+                "button"  : "a",
+                "onTime"  : 120,
+                "offTime" : 240,
+                "count"   : 1
             }
         ],
-        "count": 1
+        "count" : 1
     }
 ]

@@ -65,19 +65,19 @@
             {
                 "button"  : "up",
                 "onTime"  : 120,
-                "offTime" : 120,
+                "offTime" : 240,
                 "count"   : 1
             },
             {
                 "button"  : "right",
                 "onTime"  : 600,
-                "offTime" : 120,
+                "offTime" : 200,
                 "count"   : 1
             },
             {
                 "button"  : "a",
                 "onTime"  : 120,
-                "offTime" : 600,
+                "offTime" : 240,
                 "count"   : 1
             }
         ],
