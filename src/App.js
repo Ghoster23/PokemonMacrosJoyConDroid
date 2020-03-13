@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import './App.css';
 
+//
+// - Constants and Globals
+//
+
 const MonthLength = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 const MacroStates = {
@@ -9,6 +13,10 @@ const MacroStates = {
 	PAUSED:   2,
 	FINISHED: 3
 }
+
+//
+// - AUX Functions
+//
 
 function arrayFindIndex(array, toFind) {
 	var found = -1;
@@ -40,7 +48,10 @@ async function LoadJson(path) {
 	return res;
 }
 
-// React Components
+//
+// - React Components
+//
+
 function MacroButton(props) {
 	var style = { background : "white" };
 	if(props.selected) style = {background : "black"};
@@ -98,6 +109,7 @@ class CheckBox extends React.Component {
 	}
 }
 
+/*
 class DateInput extends React.Component {
 	constructor(props) {
 		super(props);
@@ -123,6 +135,7 @@ class DateInput extends React.Component {
 		);
 	}
 }
+*/
 
 class IntegerInput extends React.Component {
 	constructor(props) {
@@ -151,6 +164,42 @@ class IntegerInput extends React.Component {
 	}
 }
 
+class DropDownList extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {};
+
+		this.handleChange = this.handleChange.bind(this);
+	}
+
+	handleChange(event) {
+		if(event.target.value === "") {
+			this.props.onChange(0);
+			return;
+		}
+
+		this.props.onChange(parseInt(event.currentTarget.value));
+	}
+
+	renderOptions() {
+		return this.props.options.map((string, index) => {
+			return (
+				<option key = {"option" + index.toString()} value={index}>{string}</option>
+			);
+		});
+	}
+
+	render() {
+		let options = this.renderOptions();
+
+		return (
+			<select className = "drop-down-list" onChange = {this.handleChange}>
+			  {options}
+			</select>
+		);
+	}
+}
+
 class ParameterInput extends React.Component {
 	constructor(props) {
 		super(props);
@@ -163,33 +212,14 @@ class ParameterInput extends React.Component {
 
 		switch(this.props.macro) {
 			default:
-			break;
+				return (
+					<div className = "macro-parameters" id = "DefaultParams">
+					</div>
+				);
 
 			case "Time Skip":
 				return (
 					<div className = "macro-parameters" id = "TimeSkipParams">
-						<div className = "parameters-entry">
-							<label className = "parameter-label">
-								Start Date
-							</label>
-							<div className = "parameter">
-								<DateInput id = "startDate" name = "start-date"
-									date = {params.startDate}
-									onChange = {date => this.props.eventHandler("startDate", date)}
-								/>
-							</div>
-						</div>
-						<div className = "parameters-entry">
-							<label className = "parameter-label">
-								End Date
-							</label>
-							<div className = "parameter">
-								<DateInput id = "endDate" name = "end-date"
-									date = {params.endDate}
-									onChange = {date => this.props.eventHandler("endDate", date)}
-								/>
-							</div>
-						</div>
 						<div className = "parameters-entry">
 							<label className = "parameter-label">
 								Skip Count
@@ -199,6 +229,18 @@ class ParameterInput extends React.Component {
 									value = {params.daysToAdvance}
 									onChange = {value => this.props.eventHandler("daysToAdvance", value)}
 									min = "1" max = "10000"
+								/>
+							</div>
+						</div>
+						<div className = "parameters-entry">
+							<label className = "parameter-label">
+								Date Format
+							</label>
+							<div className = "parameter">
+								<DropDownList id = "dateFormat" name = "date-format"
+									value = {params.dateFormat}
+									options = {["World", "US"]}
+									onChange = {value => this.props.eventHandler("dateFormat", value)}
 								/>
 							</div>
 						</div>
@@ -229,6 +271,18 @@ class ParameterInput extends React.Component {
 									value = {params.attempts}
 									onChange = {value => this.props.eventHandler("attempts", value)}
 									min = "0" max = "10000"
+								/>
+							</div>
+						</div>
+						<div className = "parameters-entry">
+							<label className = "parameter-label">
+								Date Format
+							</label>
+							<div className = "parameter">
+								<DropDownList id = "dateFormat" name = "date-format"
+									value = {params.dateFormat}
+									options = {["World", "US"]}
+									onChange = {value => this.props.eventHandler("dateFormat", value)}
 								/>
 							</div>
 						</div>
@@ -294,9 +348,9 @@ class InfoOverlay extends React.Component {
 		}
 
 		return (
-			<div id = "infoOverlay" className = "info-overlay" style = {display_style}
-				onMouseDown  = {this.props.onMouseDown}
-				onTouchStart = {this.props.onTouchStart}>
+			<div id = "infoOverlay" className = "info-overlay" style = {display_style}>
+				<div id = "infoOverlayOut" onMouseDown  = {this.props.onMouseDown} onTouchStart = {this.props.onTouchStart}>
+				</div>
 				<div id = "infoTextBox" className = "text-box">
 					<h1 className = "infoTextTitle"> {this.props.title} </h1>
 						{sections}
@@ -306,7 +360,10 @@ class InfoOverlay extends React.Component {
 	}
 }
 
-// Coroutine Wrapper
+//
+// - Back End Elements
+//
+
 function coroutine(f, args) {
 	var o = f.apply(args);
 
@@ -438,71 +495,60 @@ class SimpleDate {
 
 class JSONManeger {
 	constructor() {
-		this.filenames = {
-			FstSkipD    : "FirstSkipDay.json",
-			FstSkipM    : "FirstSkipDayMonth.json",
-			FstSkipY    : "FirstSkipDayMonthYear.json",
-			AdvDay      : "AdvanceDay.json",
-			AdvMonth    : "AdvanceMonth.json",
-			AdvYear     : "AdvanceYear.json",
-			AdvYearLp   : "AdvanceYearLeap.json",
-			AdvDec      : "AdvanceDecember.json",
-			LotoID      : "LotoID.json",
-			Return      : "ReturnToGameFromSettings.json",
-			Universal   : "UniversalSkip.json",
-			SelectInBox : "SelectInBox.json",
-			StartWonder : "StartWonderTrade.json",
-			EndWonder   : "ConcludeWonderTrade.json"
+		this.segments = {
+			FstSkip     : {filename: "FirstSkip.json",                object: ""},
+			FstSkipUS   : {filename: "FirstSkipUS.json",              object: ""},
+			AdvDay      : {filename: "AdvanceDay.json",               object: ""},
+			LotoID      : {filename: "LotoID.json",                   object: ""},
+			Return      : {filename: "ReturnToGameFromSettings.json", object: ""},
+			Universal   : {filename: "UniversalSkip.json",            object: ""},
+			UniversalUS : {filename: "UniversalSkipUS.json",          object: ""},
+			SelectInBox : {filename: "SelectInBox.json",              object: ""},
+			StartWonder : {filename: "StartWonderTrade.json",         object: ""},
+			EndWonder   : {filename: "ConcludeWonderTrade.json",      object: ""}
 		};
 
-		this.loaded = {
-			FstSkipD    : "",
-			FstSkipM    : "",
-			FstSkipY    : "",
-			AdvDay      : "",
-			AdvMonth    : "",
-			AdvYear     : "",
-			AdvDec      : "",
-			AdvYearLp   : "",
-			LotoID      : "",
-			Return      : "",
-			Universal   : "",
-			SelectInBox : "",
-			StartWonder : "",
-			EndWonder   : "",
-			count     : 14
-		};
+		var entries = Object.entries(this.segments);
 
 		this.loadedCount = 0;
+		this.segmentCount = entries.length;
 		this.loadConcluded = false;
 
-		var keys = ["FstSkipD", "FstSkipM", "FstSkipY", "AdvDay",
-		"AdvMonth", "AdvYear", "AdvYearLp", "AdvDec", "LotoID", "Return",
-		"Universal", "SelectInBox", "StartWonder", "EndWonder"];
+		console.log("Macro segments loading starting.");
 
-		for(var k in keys) {
-			this.loadMacro(keys[k]);
+		let i = 0;
+		for(; i < this.segmentCount; i++) {
+			this.loadMacro(entries[i][0]);
 		}
 	}
 
 	async loadMacro(key) {
-		var filename = this.filenames[key];
+		console.log("Loading Macro segment ", key);
 
-		this.loaded[key] = await LoadJson("./macros/" + filename);
+		var segment = this.segments[key];
+
+		segment.object = await LoadJson("./macros/" + segment.filename);
+
+		console.log("Macro segment ", key, " has loaded.");
 
 		this.loadedCount += 1;
 
-		if(this.loadedCount === this.loaded.count) {
+		if(this.loadedCount === this.segmentCount) {
 			this.loadConcluded = true;
 			console.log("JSON Load Concluded");
 		}
 	}
 
 	getMacro(key) {
-		var copy = JSON.parse(JSON.stringify(this.loaded[key]));
+		var segment = this.segments[key];
+		var copy = JSON.parse(JSON.stringify(segment.object));
 		return copy;
 	}
 }
+
+//
+// - Macro Builders
+//
 
 class MacroBuilder {
 	constructor(jsonM, name, icon) {
@@ -552,22 +598,17 @@ class TimeSkipMacroBuilder extends MacroBuilder {
 		super(jsonM, "Time Skip", "./images/timeskip_icon.png");
 
 		// Init Parameters
-		var today    = new Date();
-		var tomorrow = new Date();
-		tomorrow.setDate(tomorrow.getDate() + 1);
-
-		this.parameters.startDate = ConvertDate(today);
-		this.parameters.endDate   = ConvertDate(tomorrow);
 		this.parameters.daysToAdvance = 1;
+		this.parameters.dateFormat    = 0;
 
-		this.onStartDateChange = this.onStartDateChange.bind(this);
-		this.onEndDateChange   = this.onEndDateChange.bind(this);
+		this.currentFormat = "";
+
 		this.onDaysToAdvanceChange = this.onDaysToAdvanceChange.bind(this);
+		this.onDateFormatChange    = this.onDateFormatChange.bind(this);
 
 		this.paramHandlers = {
-			startDate : this.onStartDateChange,
-			endDate   : this.onEndDateChange,
-			daysToAdvance : this.onDaysToAdvanceChange
+			daysToAdvance : this.onDaysToAdvanceChange,
+			dateFormat    : this.onDateFormatChange
 		};
 
 		var text1 = (
@@ -575,18 +616,13 @@ class TimeSkipMacroBuilder extends MacroBuilder {
 				<b>1-</b> In the <b>Console Settings</b>, turn <b>Synchronize Time</b> off.
 				<br/>
 				<br/>
-				<b>2-</b> The <b>Date</b> in <b>Console Settings</b> and <b>Start Date</b> must match.
+				<b>2-</b> The <b>Date</b> in <b>Console Settings</b> must be the first of any 31 day month.
 				<br/>
 				<br/>
-				<b>3-</b>
-				<br/>
-				<b>3.1-</b> Set <b>End Date</b> to the date you want to reach.
+				<b>3-</b> Set <b>Skip Count</b> to the number of days to advance.
 				<br/>
 				<br/>
-				<b>OR</b>
-				<br/>
-				<br/>
-				<b>3.2-</b> Set <b>Skip Count</b> to the number of days to advance.
+				<b>4-</b> Set <b>Date Format</b> to match your console's format.
 			</p>
 		);
 
@@ -596,6 +632,10 @@ class TimeSkipMacroBuilder extends MacroBuilder {
 				text: text1
 			},
 			{
+				title: "How it works",
+				text: "The frame of the seed will advance with each time the date is advanced. This means that we can just change the day, with the only downside being that when returning to the first of the month no advancement will happen. The macro takes this into account and adds repetitions so that in the end the correct number of skips is achieved."
+			},
+			{
 				title: "Recommendations",
 				text: "Avoid doing many skips in the Wild Area as this is known to sometimes result in game crashes. Use this macro indoors."
 			}
@@ -603,65 +643,29 @@ class TimeSkipMacroBuilder extends MacroBuilder {
 	}
 
 	// Parameter Handlers
-	onStartDateChange(newDate) {
-		if(this.parameters.startDate !== newDate) {
-			var startDate = new SimpleDate(newDate);
-			var endDate   = new SimpleDate(this.parameters.endDate);
-
-			this.parameters.startDate = newDate;
-
-			if(startDate.compare(endDate) <= 0) {
-				endDate = new SimpleDate(startDate.toString());
-				endDate.increment(1);
-
-				this.parameters.endDate = endDate.toString();
-			}
-
-			this.parameters.daysToAdvance = startDate.dayDifference(endDate);
-
-			return true;
-		}
-
-		return false;
-	}
-
-	onEndDateChange(newDate) {
-		if(this.parameters.endDate !== newDate) {
-			var endDate   = new SimpleDate(newDate);
-			var startDate = new SimpleDate(this.parameters.startDate);
-
-			this.parameters.endDate = newDate;
-
-			if(startDate.compare(endDate) <= 0) {
-				startDate = new SimpleDate(endDate.toString());
-				startDate.decrement(1);
-
-				this.parameters.startDate = startDate.toString();
-			}
-
-			this.parameters.daysToAdvance = startDate.dayDifference(endDate);
-
-			return true;
-		}
-
-		return false;
-	}
-
 	onDaysToAdvanceChange(days) {
 		if(this.parameters.daysToAdvance !== days) {
 			this.parameters.daysToAdvance = days;
 
-			var endDate = new SimpleDate(this.parameters.startDate);
+			return true;
+		}
 
-			endDate.increment(days);
+		return false;
+	}
 
-			var maxDate = new SimpleDate("2059-11-31");
+	onDateFormatChange(format) {
+		if(this.parameters.dateFormat !== format) {
+			this.parameters.dateFormat = format;
 
-			if(endDate.compare(maxDate) < 0) {
-				this.parameters.endDate = "2059-11-31";
-			}
-			else {
-				this.parameters.endDate = endDate.toString();
+			switch(format) {
+				default:
+				case 0: // WORLD
+					this.currentFormat = "";
+				break;
+
+				case 1: // US
+					this.currentFormat = "US";
+				break;
 			}
 
 			return true;
@@ -676,145 +680,11 @@ class TimeSkipMacroBuilder extends MacroBuilder {
 
 		macro[0].count = days;
 
-		return macro;
+		this.concatToMacro(macro);
 	}
 
-	AdvanceMonth(days) {
-		var macro = this.getMacro("AdvMonth");
-
-		var segment = macro[0];
-
-		segment.count = days - 1;
-		macro[0] = segment;
-
-		return macro;
-	}
-
-	InitMacro(startDate, currentDate) {
-		// If the day after the start is in the next Month
-		if(startDate.month < currentDate.month) {
-			// If the day after the start is in the next Year
-			if(startDate.year < currentDate.year) {
-				this.concatToMacro(this.getMacro("FstSkipY"));  // Advance the Day, Month and Year
-			}
-
-			// It is in the same Year
-			else {
-				this.concatToMacro(this.getMacro("FstSkipM"));  // Advance the Day and Month
-			}
-		}
-
-		// It is in the same Month
-		else {
-			this.concatToMacro(this.getMacro("FstSkipD"));
-		}
-
-		currentDate.increment(1);
-	}
-
-	NextMacroSegment(currentDate, endDate) {
-		let cYear  = currentDate.year;
-		let cMonth = currentDate.month;
-		let cDay   = currentDate.day;
-
-		let eYear  = endDate.year;
-		let eMonth = endDate.month;
-		let eDay   = endDate.day;
-
-		let daysToGo = 0;
-
-		// If Target Year has been reached
-		if(cYear === eYear) {
-			// If Target Month has been reached
-			if(cMonth === eMonth) {
-				daysToGo = eDay - cDay;
-
-				this.concatToMacro(this.AdvanceDay(daysToGo));
-			}
-
-			// Not at Target Month and at the start of a Month
-			else if(cDay === 1){
-				let i = cMonth;
-				for(; i < eMonth; i++) {
-					daysToGo = MonthLength[i];
-
-					this.concatToMacro(this.AdvanceMonth(daysToGo));
-				}
-			}
-
-			// Not at Target Month and not at the start of a Month
-			else {
-				daysToGo = currentDate.daysToNextMonth();
-
-				this.concatToMacro(this.AdvanceMonth(daysToGo));
-			}
-
-			currentDate.increment(daysToGo);
-		}
-
-		// Not at Target Year and at the start of a Month
-		else if(cDay === 1){
-			// If it's January
-			if(cMonth === 0) {
-				// If it's a Leap Year
-				if(this.isLeapYear(cYear)) {
-					this.concatToMacro(this.getMacro("AdvYearLp"));
-
-					currentDate.increment(366);
-				}
-
-				// If Not
-				else {
-					this.concatToMacro(this.getMacro("AdvYear"));
-
-					currentDate.increment(365);
-				}
-			}
-
-			// If it's December
-			else if(cMonth === 11) {
-				this.concatToMacro(this.getMacro("AdvDec"));
-
-				currentDate.increment(31);
-			}
-
-			// Other Months
-			else {
-				let i = cMonth;
-				for(; i < 11; i++) {
-					daysToGo = currentDate.daysToNextMonth();
-
-					this.concatToMacro(this.AdvanceMonth(daysToGo));
-
-					currentDate.increment(daysToGo);
-				}
-			}
-		}
-
-		// Not Target Year and not at the start of a Month
-		else {
-			// If it is December
-			if(cMonth === 11) {
-				var macro = this.getMacro("AdvDec");
-
-				var segment = macro[0];
-				segment.count = 31 - cDay;
-				macro[0] = segment;
-
-				this.concatToMacro(macro);
-
-				currentDate.increment(31);
-			}
-
-			// Any other Month
-			else {
-				daysToGo = currentDate.daysToNextMonth();
-
-				this.concatToMacro(this.AdvanceMonth(daysToGo));
-
-				currentDate.increment(daysToGo);
-			}
-		}
+	InitMacro() {
+		this.concatToMacro(this.getMacro("FstSkip" + this.currentFormat));
 	}
 
 	build() {
@@ -822,16 +692,19 @@ class TimeSkipMacroBuilder extends MacroBuilder {
 
 		this.macroJSON = []; // Clear Macro JSON
 
-		var startDate = new SimpleDate(this.parameters.startDate);
-		var endDate   = new SimpleDate(this.parameters.endDate);
+		this.InitMacro();
 
-		var currentDate = new SimpleDate(this.parameters.startDate);
+		var count = this.parameters.daysToAdvance;
 
-		this.InitMacro(startDate, currentDate);
+		// If more than 1 skip
+		if(count > 1) {
+			let adjust = Math.floor(count / 31);
 
-		// While End Date has not been reached
-		while(currentDate.compare(endDate) > 0) {
-			this.NextMacroSegment(currentDate, endDate);
+			if(adjust >= 31) {
+				adjust += Math.floor(adjust / 31);
+			}
+
+			this.AdvanceDay(count + adjust);
 		}
 
 		this.concatToMacro(this.getMacro("Return"));
@@ -848,9 +721,13 @@ class LotoIDMacroBuilder extends MacroBuilder {
 
 		this.parameters.attempts  = 0;
 		this.parameters.getFirst  = true;
+		this.parameters.dateFormat = 0;
+
+		this.currentFormat = "";
 
 		this.onAttemptsChange = this.onAttemptsChange.bind(this);
 		this.onGetFirstChange = this.onGetFirstChange.bind(this);
+		this.onDateFormatChange = this.onDateFormatChange.bind(this);
 
 		this.paramHandlers = {
 			attempts  : this.onAttemptsChange,
@@ -869,6 +746,9 @@ class LotoIDMacroBuilder extends MacroBuilder {
 				<br/>
 				<br/>
 				<b>4-</b> Set <b>Attempts</b> to how many times you want to try the Loto.
+				<br/>
+				<br/>
+				<b>5-</b> Set <b>Date Format</b> to the your Switch's region date format.
 			</p>
 		);
 
@@ -894,6 +774,27 @@ class LotoIDMacroBuilder extends MacroBuilder {
 	onGetFirstChange(bool) {
 		if(this.parameters.getFirst !== bool) {
 			this.parameters.getFirst = bool;
+
+			return true;
+		}
+
+		return false;
+	}
+
+	onDateFormatChange(format) {
+		if(this.parameters.dateFormat !== format) {
+			this.parameters.dateFormat = format;
+
+			switch(format) {
+				default:
+				case 0: // WORLD
+					this.currentFormat = "";
+				break;
+
+				case 1: // US
+					this.currentFormat = "US";
+				break;
+			}
 
 			return true;
 		}
@@ -940,7 +841,7 @@ class LotoIDMacroBuilder extends MacroBuilder {
 
 		// While End Date has not been reached
 		while(counter < this.parameters.attempts) {
-			this.concatToMacro(this.getMacro("Universal"));
+			this.concatToMacro(this.getMacro("Universal" + this.currentFormat));
 			counter++;
 
 			this.concatToMacro(this.getMacro("Return"));
@@ -1088,116 +989,9 @@ class WonderBoxMacroBuilder extends MacroBuilder {
 	}
 }
 
-class KeyLogger {
-	constructor() {
-		this.log = [];
-		this.log_count = 0;
-
-		this.active = [];
-		this.active_count = 0;
-	}
-
-	clear() {
-		this.log = [];
-		this.log_count = 0;
-
-		this.active = [];
-		this.active_count = 0;
-	}
-
-	pressKey(key, time) {
-		var ind = arrayFindIndex(this.active, key);
-
-		// If key is not pressed
-		if(ind === -1) {
-			this.active[this.active_count] = key;
-			this.active_count++;
-
-			this.logKeyPress(key, time);
-		}
-	}
-
-	logKeyPress(key, time) {
-		this.log[this.log_count] = {index: this.log_count, key: key,
-			onTime: time, offTime: ''};
-
-		this.log_count++;
-	}
-
-	releaseKey(key, time) {
-		if(this.active_count > 0) {
-			var ind = arrayFindIndex(this.active, key);
-
-			// If key is pressed
-			if(ind !== -1) {
-				this.active.splice(ind, 1);
-				this.active_count--;
-
-				this.logKeyRelease(key, time);
-			}
-		}
-	}
-
-	logKeyRelease(key, time) {
-		var i = 0;
-		for(; i < this.log_count; i++) {
-			var entry = this.log[this.log_count - (i + 1)];
-
-			if(entry.key === key && entry.offTime === '') {
-				entry.offTime = time;
-				this.log[i] = entry;
-				break;
-			}
-		}
-	}
-
-	update(key, pressed, time) {
-		// If key is being pressed
-		if(pressed) {
-			this.pressKey(key, time);
-		}
-		// If key is being released
-		else {
-			this.releaseKey(key, time);
-		}
-	}
-
-	renderPressed() {
-		var pressed = this.active.map((key, index) => {
-			return (
-				<div className = "pressedKey" key = {key}>
-					{key}
-				</div>
-			)
-		});
-
-		return (
-			<div id = "PressedKeys">
-				<b> Pressed </b>
-				{pressed}
-			</div>
-		);
-	}
-
-	renderLogged() {
-		var keyLogs = [];
-
-		if(this.log_count > 0) {
-			var i = 0;
-			for(; i < Math.min(3, this.log_count); i++) {
-				var l = this.log[this.log_count - (i + 1)];
-				keyLogs.push(<KeyLog key = {"keylog_" + i} index = {l.index.toString()}
-				pressedKey = {l.key} onTime = {l.onTime} offTime = {l.offTime}/>);
-			}
-		}
-
-		return (
-			<div id = "KeyLogs">
-				{keyLogs}
-			</div>
-		);
-	}
-}
+//
+// - APP Components
+//
 
 class Macro {
 	constructor(name, icon, segments) {
@@ -1215,6 +1009,8 @@ class Macro {
 
 		this.totalSteps = 0;
 		this.currentOverallStep = 0;
+
+		this.totalTime = 0;
 
 		var i;
 		for(i = 0; i < this.segments.length; i++) {
@@ -1603,6 +1399,179 @@ class MacroPlayer {
 	}
 }
 
+class KeyLogger {
+	constructor() {
+		this.keys = {
+			a               : {pressed : false, pendingLog: null},
+			b               : {pressed : false, pendingLog: null},
+			x               : {pressed : false, pendingLog: null},
+			y               : {pressed : false, pendingLog: null},
+			lsl             : {pressed : false, pendingLog: null},
+			lsr             : {pressed : false, pendingLog: null},
+			rsl             : {pressed : false, pendingLog: null},
+			rsr             : {pressed : false, pendingLog: null},
+			plus            : {pressed : false, pendingLog: null},
+			minus           : {pressed : false, pendingLog: null},
+			up              : {pressed : false, pendingLog: null},
+			right           : {pressed : false, pendingLog: null},
+			left            : {pressed : false, pendingLog: null},
+			down            : {pressed : false, pendingLog: null},
+			left_stick      : {pressed : false, pendingLog: null},
+			right_stick     : {pressed : false, pendingLog: null},
+			left_stick_dir  : {pressed : false, pendingLog: null},
+			right_stick_dir : {pressed : false, pendingLog: null},
+			home            : {pressed : false, pendingLog: null}
+		};
+
+		this.log = [];
+		this.log_count = 0;
+	}
+
+	clear() {
+		this.keys = {
+			a               : {pressed : false, pendingLog: null},
+			b               : {pressed : false, pendingLog: null},
+			x               : {pressed : false, pendingLog: null},
+			y               : {pressed : false, pendingLog: null},
+			lsl             : {pressed : false, pendingLog: null},
+			lsr             : {pressed : false, pendingLog: null},
+			rsl             : {pressed : false, pendingLog: null},
+			rsr             : {pressed : false, pendingLog: null},
+			plus            : {pressed : false, pendingLog: null},
+			minus           : {pressed : false, pendingLog: null},
+			up              : {pressed : false, pendingLog: null},
+			right           : {pressed : false, pendingLog: null},
+			left            : {pressed : false, pendingLog: null},
+			down            : {pressed : false, pendingLog: null},
+			left_stick      : {pressed : false, pendingLog: null},
+			right_stick     : {pressed : false, pendingLog: null},
+			left_stick_dir  : {pressed : false, pendingLog: null},
+			right_stick_dir : {pressed : false, pendingLog: null},
+			home            : {pressed : false, pendingLog: null}
+		};
+
+		this.log = [];
+		this.log_count = 0;
+	}
+
+	pressKey(key, time) {
+		let info = this.keys[key];
+
+		// If key is not pressed
+		if(info.pressed === false) {
+			info.pressed = true;
+
+			info.pendingLog = this.addLogEntry(key, time);
+		}
+
+		this.keys[key] = info;
+	}
+
+	addLogEntry(key, time) {
+		let entry = {index: this.log_count, key: key, onTime: time, offTime: ''}
+
+		this.log[this.log_count] = entry;
+
+		this.log_count++;
+
+		return entry;
+	}
+
+	releaseKey(key, time) {
+		let info = this.keys[key];
+
+		if(info.pressed === true) {
+			info.pressed = false;
+
+			let entry = info.pendingLog;
+			info.pendingLog = null;
+
+			entry.offTime = time;
+
+			this.log[entry.index] = entry;
+		}
+	}
+
+	getPressed() {
+		let pressedKeys = [];
+
+		for(let entry in this.keys) {
+			let info = this.keys[entry];
+
+			if(info.pressed === true) {
+				pressedKeys.push(entry);
+			}
+		}
+
+		return pressedKeys;
+	}
+
+	update(key, pressed, time) {
+		// If key is being pressed
+		if(pressed) {
+			this.pressKey(key, time);
+		}
+		// If key is being released
+		else {
+			this.releaseKey(key, time);
+		}
+	}
+
+	renderPressed() {
+		let info = Object.entries(this.keys);
+
+		let render = [];
+		let count  =  0;
+
+		let i = 0;
+		for(; i < info.length; i++) {
+			let keyData = info[i];
+
+			if(keyData[1].pressed === true) {
+				render[count] = (
+					<div className = "pressedKey" key = {keyData[0]}>
+						{keyData[0]}
+					</div>
+				);
+
+				count++;
+			}
+		}
+
+		return (
+			<div id = "PressedKeys">
+				<b> Pressed </b>
+				{render}
+			</div>
+		);
+	}
+
+	renderLogged() {
+		var keyLogs = [];
+
+		if(this.log_count > 0) {
+			var i = 0;
+			for(; i < Math.min(3, this.log_count); i++) {
+				var l = this.log[this.log_count - (i + 1)];
+				keyLogs.push(
+					<KeyLog key = {"keylog_" + i} index = {l.index.toString()}
+						pressedKey = {l.key} onTime = {l.onTime} offTime = {l.offTime}/>
+				);
+			}
+		}
+
+		return (
+			<div id = "KeyLogs">
+				{keyLogs}
+			</div>
+		);
+	}
+}
+
+//
+// - APP
+//
+
 class App extends Component {
 	constructor(props) {
 		super(props);
@@ -1670,6 +1639,12 @@ class App extends Component {
 
 			case "reset":
 				if(this.macroPlayer.reset()) {
+					var pressedKeys = this.keyLogger.getPressed();
+
+					for(let key in pressedKeys) {
+						this.handleSwitchKeys(key, false);
+					}
+
 					this.keyLogger.clear();
 				}
 			break;
@@ -1870,13 +1845,6 @@ class App extends Component {
 							Pause
 						</button>
 					</div>
-					<button key = "testA" className = "player-button" id = "testA"
-						onMouseDown  = {e => this.handleSwitchKeys("a", true)}
-						onMouseUp    = {e => this.handleSwitchKeys("a", false)}
-						onTouchStart = {e => this.handleSwitchKeys("a", true)}
-						onTouchEnd   = {e => this.handleSwitchKeys("a", false)}>
-						A
-					</button>
 				</div>
 			</div>
 		);
