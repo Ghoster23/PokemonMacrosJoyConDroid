@@ -28,7 +28,7 @@
             },
             {
                 "button"  : "down",
-                "onTime"  : 1200,
+                "onTime"  : 1680,
                 "offTime" : 120,
                 "count"   : 1
             },
