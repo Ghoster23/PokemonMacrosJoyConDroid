@@ -43,7 +43,9 @@ function ConvertDate(date) {
 async function LoadJson(path) {
 	var res = null;
 
-	res = await fetch(path).then(response => { return response.json(); } );
+	let url = "https://cdn.jsdelivr.net/gh/Ghoster23/PokemonMacrosJoyConDroid/public/macros/";
+
+	res = await fetch(url + path).then(response => { return response.json(); } );
 
 	return res;
 }
@@ -542,7 +544,7 @@ class JSONManeger {
 	async loadMacro(key) {
 		var segment = this.segments[key];
 
-		segment.object = await LoadJson("./macros/" + segment.filename);
+		segment.object = await LoadJson(segment.filename);
 
 		this.loadedCount += 1;
 
