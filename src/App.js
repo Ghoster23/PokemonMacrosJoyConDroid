@@ -517,6 +517,7 @@ class JSONManeger {
 			FstSkip     : {filename: "FirstSkip.json",                object: ""},
 			FstSkipUS   : {filename: "FirstSkipUS.json",              object: ""},
 			AdvDay      : {filename: "AdvanceDay.json",               object: ""},
+			AdvDayUS    : {filename: "AdvanceDayUS.json",             object: ""},
 			LotoID      : {filename: "LotoID.json",                   object: ""},
 			Return      : {filename: "ReturnToGameFromSettings.json", object: ""},
 			Universal   : {filename: "UniversalSkip.json",            object: ""},
@@ -688,7 +689,7 @@ class TimeSkipMacroBuilder extends MacroBuilder {
 
 	// Build Macro
 	AdvanceDay(days) {
-		var macro = this.getMacro("AdvDay");
+		var macro = this.getMacro("AdvDay" + this.currentFormat);
 
 		macro[0].count = days;
 
@@ -716,7 +717,7 @@ class TimeSkipMacroBuilder extends MacroBuilder {
 				adjust += Math.floor(adjust / 31);
 			}
 
-			this.AdvanceDay(count + adjust);
+			this.AdvanceDay((count - 1) + adjust);
 		}
 
 		this.concatToMacro(this.getMacro("Return"));
