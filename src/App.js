@@ -52,6 +52,24 @@ async function LoadJson(path) {
 // - React Components
 //
 
+function PlayerButton(props) {
+	var divStyle = { background : "#FFF" };
+	var iconStyle = {};
+
+	if(props.selected) {
+		divStyle  = { background : "#000" };
+		iconStyle = { filter : "invert(1)" };
+	}
+
+	return (
+		<div className = "player-button" id = {props.name} style = {divStyle}
+			onClick = {e => props.clickHandler()} >
+			<img className = "icon" src = {props.src} alt = {props.name + " Button Icon"}
+				style = {iconStyle} />
+		</div>
+	);
+}
+
 function MacroButton(props) {
 	var style = { background : "white" };
 	if(props.selected) style = {background : "black"};
@@ -514,8 +532,6 @@ class JSONManeger {
 		this.segmentCount = entries.length;
 		this.loadConcluded = false;
 
-		console.log("Macro segments loading starting.");
-
 		let i = 0;
 		for(; i < this.segmentCount; i++) {
 			this.loadMacro(entries[i][0]);
@@ -523,13 +539,9 @@ class JSONManeger {
 	}
 
 	async loadMacro(key) {
-		console.log("Loading Macro segment ", key);
-
 		var segment = this.segments[key];
 
 		segment.object = await LoadJson("./macros/" + segment.filename);
-
-		console.log("Macro segment ", key, " has loaded.");
 
 		this.loadedCount += 1;
 
@@ -719,7 +731,7 @@ class LotoIDMacroBuilder extends MacroBuilder {
 	constructor(jsonM) {
 		super(jsonM, "Loto ID", "./images/lotoid_icon.png");
 
-		this.parameters.attempts  = 0;
+		this.parameters.attempts  = 1;
 		this.parameters.getFirst  = true;
 		this.parameters.dateFormat = 0;
 
@@ -860,9 +872,9 @@ class WonderBoxMacroBuilder extends MacroBuilder {
 		super(jsonM, "Wonder Box", "./images/wonderbox_icon.png");
 
 		this.parameters.count    = 1;
-		this.parameters.waitTime = 35;
+		this.parameters.waitTime = 25;
 
-		this.onCountChange = this.onCountChange.bind(this);
+		this.onCountChange    = this.onCountChange.bind(this);
 		this.onWaitTimeChange = this.onWaitTimeChange.bind(this);
 
 		this.paramHandlers = {
@@ -965,7 +977,7 @@ class WonderBoxMacroBuilder extends MacroBuilder {
 		var column = 0;
 
 		for(; row < 5; row++) {
-			for(; column < 6; column++) {
+			for(column = 0; column < 6; column++) {
 				this.concatToMacro(this.getMacro("StartWonder"));
 
 				this.SelectInBox(row, column);
@@ -1209,7 +1221,7 @@ class MacroPlayer {
 	}
 
 	selectMacro(index) {
-		if(this.state.selectedMacro === index) return;
+		if(this.state.selectedMacro === index) return false;
 
 		var audio = new Audio("/click.mp3");
 		audio.play();
@@ -1224,6 +1236,8 @@ class MacroPlayer {
 		}
 
 		this.state.selectedMacro = index;
+
+		return true;
 	}
 
 	changeParameter(key, value) {
@@ -1256,6 +1270,8 @@ class MacroPlayer {
 					this.dirtyMacro[index] = false;
 
 					this.buildMacro(index);
+
+					currentMacro = this.macros[index];
 				}
 
 				currentMacro.startRunner();
@@ -1455,16 +1471,18 @@ class KeyLogger {
 	}
 
 	pressKey(key, time) {
-		let info = this.keys[key];
+		if(key !== "buffer") {
+			let info = this.keys[key];
 
-		// If key is not pressed
-		if(info.pressed === false) {
-			info.pressed = true;
+			// If key is not pressed
+			if(info.pressed === false) {
+				info.pressed = true;
 
-			info.pendingLog = this.addLogEntry(key, time);
+				info.pendingLog = this.addLogEntry(key, time);
+			}
+
+			this.keys[key] = info;
 		}
-
-		this.keys[key] = info;
 	}
 
 	addLogEntry(key, time) {
@@ -1478,17 +1496,19 @@ class KeyLogger {
 	}
 
 	releaseKey(key, time) {
-		let info = this.keys[key];
+		if(key !== "buffer") {
+			let info = this.keys[key];
 
-		if(info.pressed === true) {
-			info.pressed = false;
+			if(info.pressed === true) {
+				info.pressed = false;
 
-			let entry = info.pendingLog;
-			info.pendingLog = null;
+				let entry = info.pendingLog;
+				info.pendingLog = null;
 
-			entry.offTime = time;
+				entry.offTime = time;
 
-			this.log[entry.index] = entry;
+				this.log[entry.index] = entry;
+			}
 		}
 	}
 
@@ -1618,12 +1638,9 @@ class App extends Component {
 		}
 	}
 
-	onButtonEvent(name, pressed) {
+	onButtonEvent(name) {
 		var audio = new Audio("/click.mp3");
-
-		if(pressed) {
-			audio.play();
-		}
+    audio.play();
 
 		switch (name) {
 			default:
@@ -1650,6 +1667,7 @@ class App extends Component {
 			break;
 
 			case "info":
+				let pressed = !this.state.displayInfo;
 				this.setState({displayInfo: pressed});
 			break;
 		}
@@ -1658,7 +1676,9 @@ class App extends Component {
 	}
 
 	selectMacro(index) {
-		this.macroPlayer.selectMacro(index);
+		if(this.macroPlayer.selectMacro(index)) {
+			this.keyLogger.clear();
+		}
 	}
 
 	parameterChange(key, value) {
@@ -1800,6 +1820,8 @@ class App extends Component {
 		const parameters = this.renderParameters();
 		const info = this.renderInfo();
 
+		const current = this.macroPlayer.state.playState;
+
 		return (
 			<div className = "App" style = {{backgroundImage: "url(./images/background.png)"}}>
 				<div className = "App-header">
@@ -1823,27 +1845,12 @@ class App extends Component {
 						</div>
 					</div>
 					<div id = "PlayerButtons">
-						<button key = "reset" className = "player-button" id = "Reset"
-							onMouseDown  = {e => this.onButtonEvent("reset", true)}
-							onMouseUp    = {e => this.onButtonEvent("reset", false)}
-							onTouchStart = {e => this.onButtonEvent("reset", true)}
-							onTouchEnd   = {e => this.onButtonEvent("reset", false)}>
-							Reset
-						</button>
-						<button key = "play" className = "player-button" id = "Play"
-							onMouseDown  = {e => this.onButtonEvent("play", true)}
-							onMouseUp    = {e => this.onButtonEvent("play", false)}
-							onTouchStart = {e => this.onButtonEvent("play", true)}
-							onTouchEnd   = {e => this.onButtonEvent("play", false)}>
-							Play
-						</button>
-						<button key = "pause" className = "player-button" id = "Pause"
-							onMouseDown  = {e => this.onButtonEvent("pause", true)}
-							onMouseUp    = {e => this.onButtonEvent("pause", false)}
-							onTouchStart = {e => this.onButtonEvent("pause", true)}
-							onTouchEnd   = {e => this.onButtonEvent("pause", false)}>
-							Pause
-						</button>
+						<PlayerButton id = "ResetButton" selected = {current === MacroStates.INACTIVE} name = "Reset"
+							src = "./images/reset_icon.png" clickHandler = {e => this.onButtonEvent("reset")}/>
+						<PlayerButton id = "PlayButton" selected = {current === MacroStates.PLAYING} name = "Play"
+							src = "./images/play_icon.png" clickHandler = {e => this.onButtonEvent("play")}/>
+						<PlayerButton id = "PauseButton" selected = {current === MacroStates.PAUSED} name = "Pause"
+							src = "./images/pause_icon.png" clickHandler = {e => this.onButtonEvent("pause")}/>
 					</div>
 				</div>
 			</div>
