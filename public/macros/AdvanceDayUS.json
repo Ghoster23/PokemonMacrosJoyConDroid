@@ -12,7 +12,7 @@
                 "button"  : "left",
                 "onTime"  : 120,
                 "offTime" : 240,
-                "count"   : 4
+                "count"   : 5
             },
             {
                 "button"  : "up",
