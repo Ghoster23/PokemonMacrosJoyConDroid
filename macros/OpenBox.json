@@ -11,7 +11,7 @@
             {
                 "button"  : "a",
                 "onTime"  : 120,
-                "offTime" : 1440,
+                "offTime" : 1600,
                 "count"   : 1
             },
             {
