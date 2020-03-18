@@ -9,13 +9,13 @@
                 "count"   : 0
             },
             {
-                "button"  : "down",
+                "button"  : "left",
                 "onTime"  : 100,
                 "offTime" : 180,
                 "count"   : 0
             },
             {
-                "button"  : "left",
+                "button"  : "down",
                 "onTime"  : 100,
                 "offTime" : 180,
                 "count"   : 0
