@@ -15,7 +15,7 @@
                 "count"   : 1
             },
             {
-                "button"  : "rsr",
+                "button"  : "r",
                 "onTime"  : 120,
                 "offTime" : 1440,
                 "count"   : 1
