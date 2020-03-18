@@ -1,6 +1,6 @@
 [
     {
-        "name": "Select in Box",
+        "name": "Place in Box",
         "macro": [
             {
                 "button"  : "right",
@@ -30,18 +30,6 @@
                 "button"  : "a",
                 "onTime"  : 100,
                 "offTime" : 200,
-                "count"   : 1
-            },
-            {
-                "button"  : "down",
-                "onTime"  : 100,
-                "offTime" : 180,
-                "count"   : 0
-            },
-            {
-                "button"  : "a",
-                "onTime"  : 100,
-                "offTime" : 1000,
                 "count"   : 1
             }
         ],

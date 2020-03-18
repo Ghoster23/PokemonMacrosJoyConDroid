@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/PokemonMacrosJoyConDroid/precache-manifest.0b22de6e93269d2ff66eb87a02f57e5e.js"
+  "/PokemonMacrosJoyConDroid/precache-manifest.49b3dd5da301589f570bc04246cc4185.js"
 );
 
 self.addEventListener('message', (event) => {
