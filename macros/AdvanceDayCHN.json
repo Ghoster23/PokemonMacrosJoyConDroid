@@ -1,0 +1,38 @@
+[
+    {
+        "name": "Advance Day CHN",
+        "macro": [
+            {
+                "button"  : "a",
+                "onTime"  : 120,
+                "offTime" : 600,
+                "count"   : 1
+            },
+            {
+                "button"  : "left",
+                "onTime"  : 120,
+                "offTime" : 240,
+                "count"   : 4
+            },
+            {
+                "button"  : "up",
+                "onTime"  : 120,
+                "offTime" : 240,
+                "count"   : 1
+            },
+            {
+                "button"  : "right",
+                "onTime"  : 480,
+                "offTime" : 200,
+                "count"   : 1
+            },
+            {
+                "button"  : "a",
+                "onTime"  : 120,
+                "offTime" : 240,
+                "count"   : 1
+            }
+        ],
+        "count" : 1
+    }
+]
