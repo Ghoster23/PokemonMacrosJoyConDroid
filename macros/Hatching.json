@@ -25,7 +25,7 @@
                 "onTime"   : 5000,
                 "offTime"  : 120,
                 "count"    : 1,
-                "strength" : 1,
+                "strength" : 100,
                 "angle"    : 45
             },
             {
@@ -33,7 +33,7 @@
                 "onTime"   : 30000,
                 "offTime"  : 0,
                 "count"    : 1,
-                "strength" : 1,
+                "strength" : 100,
                 "angle"    : 180,
                 "block"    : false
             },
@@ -42,7 +42,7 @@
                 "onTime"   : 30000,
                 "offTime"  : 120,
                 "count"    : 1,
-                "strength" : 1,
+                "strength" : 100,
                 "angle"    : 90
             }
         ],
