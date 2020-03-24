@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/PokemonMacrosJoyConDroid/static/css/main.acbdd099.chunk.css",
-    "main.js": "/PokemonMacrosJoyConDroid/static/js/main.f612eb97.chunk.js",
-    "main.js.map": "/PokemonMacrosJoyConDroid/static/js/main.f612eb97.chunk.js.map",
+    "main.js": "/PokemonMacrosJoyConDroid/static/js/main.21f6e486.chunk.js",
+    "main.js.map": "/PokemonMacrosJoyConDroid/static/js/main.21f6e486.chunk.js.map",
     "runtime-main.js": "/PokemonMacrosJoyConDroid/static/js/runtime-main.ad906206.js",
     "runtime-main.js.map": "/PokemonMacrosJoyConDroid/static/js/runtime-main.ad906206.js.map",
     "static/js/2.0ac95d66.chunk.js": "/PokemonMacrosJoyConDroid/static/js/2.0ac95d66.chunk.js",
     "static/js/2.0ac95d66.chunk.js.map": "/PokemonMacrosJoyConDroid/static/js/2.0ac95d66.chunk.js.map",
     "index.html": "/PokemonMacrosJoyConDroid/index.html",
-    "precache-manifest.510ba6f5321288b391cc0fad24763b17.js": "/PokemonMacrosJoyConDroid/precache-manifest.510ba6f5321288b391cc0fad24763b17.js",
+    "precache-manifest.d57f80e33a645b86049aa4df4083df2f.js": "/PokemonMacrosJoyConDroid/precache-manifest.d57f80e33a645b86049aa4df4083df2f.js",
     "service-worker.js": "/PokemonMacrosJoyConDroid/service-worker.js",
     "static/css/main.acbdd099.chunk.css.map": "/PokemonMacrosJoyConDroid/static/css/main.acbdd099.chunk.css.map",
     "static/js/2.0ac95d66.chunk.js.LICENSE": "/PokemonMacrosJoyConDroid/static/js/2.0ac95d66.chunk.js.LICENSE"
@@ -17,6 +17,6 @@
     "static/js/runtime-main.ad906206.js",
     "static/js/2.0ac95d66.chunk.js",
     "static/css/main.acbdd099.chunk.css",
-    "static/js/main.f612eb97.chunk.js"
+    "static/js/main.21f6e486.chunk.js"
   ]
 }
