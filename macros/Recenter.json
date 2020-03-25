@@ -1,0 +1,32 @@
+[
+    {
+        "name"  : "Recenter at Nursery",
+        "macro" : [
+            {
+                "button"  : "x",
+                "onTime"  : 120,
+                "offTime" : 720,
+                "count"   : 1
+            },
+            {
+                "button"  : "a",
+                "onTime"  : 120,
+                "offTime" : 2400,
+                "count"   : 1
+            },
+            {
+                "button"  : "a",
+                "onTime"  : 120,
+                "offTime" : 600,
+                "count"   : 1
+            },
+            {
+                "button"  : "a",
+                "onTime"  : 120,
+                "offTime" : 1400,
+                "count"   : 1
+            },
+        ],
+        "count" : 1
+    }
+]
