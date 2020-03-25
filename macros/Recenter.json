@@ -23,7 +23,7 @@
             {
                 "button"  : "a",
                 "onTime"  : 120,
-                "offTime" : 1400,
+                "offTime" : 2400,
                 "count"   : 1
             }
         ],
