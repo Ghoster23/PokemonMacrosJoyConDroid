@@ -29,7 +29,7 @@
             {
                 "button"  : "a",
                 "onTime"  : 120,
-                "offTime" : 480,
+                "offTime" : 600,
                 "count"   : 2
             },
             {
@@ -44,7 +44,7 @@
                 "offTime"  : 120,
                 "count"    : 1,
                 "strength" : 100,
-                "angle"    : 60
+                "angle"    : 53
             },
             {
                 "button"   : "right_stick_dir",
