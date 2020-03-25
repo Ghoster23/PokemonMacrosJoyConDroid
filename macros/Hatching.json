@@ -62,30 +62,6 @@
                 "count"    : 1,
                 "strength" : 100,
                 "angle"    : 90
-            },
-            {
-                "button"  : "x",
-                "onTime"  : 120,
-                "offTime" : 840,
-                "count"   : 1
-            },
-            {
-                "button"  : "right",
-                "onTime"  : 120,
-                "offTime" : 240,
-                "count"   : 1
-            },
-            {
-                "button"  : "up",
-                "onTime"  : 120,
-                "offTime" : 240,
-                "count"   : 1
-            },
-            {
-                "button"  : "b",
-                "onTime"  : 120,
-                "offTime" : 840,
-                "count"   : 1
             }
         ],
         "count" : 1
