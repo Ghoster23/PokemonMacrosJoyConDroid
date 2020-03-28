@@ -47,10 +47,10 @@
             },
             {
                 "button"   : "left_stick_dir",
-                "onTime"   : 1440,
+                "onTime"   : 1200,
                 "offTime"  : 120,
                 "count"    : 1,
-                "strength" : 1,
+                "strength" : 100,
                 "angle"    : 90
             }
         ],
