@@ -47,7 +47,7 @@
             },
             {
                 "button"   : "left_stick_dir",
-                "onTime"   : 960,
+                "onTime"   : 1440,
                 "offTime"  : 120,
                 "count"    : 1,
                 "strength" : 1,
