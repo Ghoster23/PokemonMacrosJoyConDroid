@@ -1,0 +1,174 @@
+
+Add to segments:
+EndRaid   : {filename: "EndRaid.json",                  object: ""},
+StartRaid   : {filename: "StartRaid.json",                object: ""},
+
+Add this Builder:
+class WattFarm extends MacroBuilder {
+	constructor(jsonM) {
+		super(jsonM, "Farm Watts", "./images/timeskip_icon.png");
+
+		// Init Parameters
+		this.parameters.daysToAdvance = 1;
+		this.parameters.dateFormat    = 0;
+
+		this.currentFormat = "";
+
+		this.onDaysToAdvanceChange = this.onDaysToAdvanceChange.bind(this);
+		this.onDateFormatChange    = this.onDateFormatChange.bind(this);
+
+		this.paramHandlers = {
+			daysToAdvance : this.onDaysToAdvanceChange,
+			dateFormat    : this.onDateFormatChange
+		};
+
+		var text1 = (
+			<p>
+		  	<b>1-</b> In-game, position yourself in front of an active raid den spawned by a wishing piece. - Make sure the den is glowing - we must be able to collect the watts.s
+	  		<br/>
+	   		<br/>
+				<b>2-</b> In the <b>Console Settings</b>, turn <b>Synchronize Time</b> off.
+				<br/>
+				<br/>
+				<b>3-</b> The <b>Date</b> in <b>Console Settings</b> must be the first of any 31 day month.
+				<br/>
+				<br/>
+				<b>4-</b> Set <b>Skip Count</b> to the number of days to advance - If you have beaten the game, you will get 2000 watts for each day you skip. Otherwise, you get 200.
+				<br/>
+				<br/>
+				<b>5-</b> Set <b>Date Format</b> to match your console's format.
+			</p>
+		);
+
+		this.info = [
+			{
+				title: "Setup:",
+				text: text1
+			},
+			{
+				title: "How it works",
+				text: "The frame of the seed will advance with each time the date is advanced. This means that we can just change the day, with the only downside being that when returning to the first of the month no advancement will happen. The macro takes this into account and adds repetitions so that in the end the correct number of skips is achieved."
+			},
+			{
+				title: "Recommendations",
+				text: "Avoid doing this in an area where pokemon can spawn."
+			}
+		];
+	}
+
+	// Parameter Handlers
+	onDaysToAdvanceChange(days) {
+		if(this.parameters.daysToAdvance !== days) {
+			this.parameters.daysToAdvance = days;
+
+			return true;
+		}
+
+		return false;
+	}
+
+	onDateFormatChange(format) {
+		if(this.parameters.dateFormat !== format) {
+			this.parameters.dateFormat = format;
+
+			switch(format) {
+				default:
+				case 0: // WORLD
+					this.currentFormat = "";
+				break;
+
+				case 1: // US
+					this.currentFormat = "US";
+				break;
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	// Build Macro
+	AdvanceDay(days) {
+for(var i=0; i<days; i++){
+    this.concatToMacro(this.getMacro("StartRaid"));
+		this.concatToMacro(this.getMacro("FstSkip" + this.currentFormat));
+    this.concatToMacro(this.getMacro("Return"));
+		    this.concatToMacro(this.getMacro("Return"));
+}
+	}
+
+	build() {
+		if(!this.jsonManager.loadConcluded) return null;
+
+		this.macroJSON = []; // Clear Macro JSON
+
+
+		var count = this.parameters.daysToAdvance;
+
+		// If more than 1 skip
+		if(count > 1) {
+			let adjust = Math.floor(count / 31);
+
+			if(adjust >= 31) {
+				adjust += Math.floor(adjust / 31);
+			}
+
+			this.AdvanceDay((count - 1) + adjust);
+		}
+
+
+
+		this.macro = new Macro(this.name, this.icon, this.macroJSON);
+
+		return this.macro;
+	}
+}
+
+
+
+
+  StartRaid.json:
+  [
+      {
+          "name": "Start Raid",
+          "macro": [
+              {
+                  "button"  : "a",
+                  "onTime"  : 120,
+                  "offTime" : 600,
+                  "count"   : 3
+              }
+              {
+                  "button"  : "a",
+                  "onTime"  : 120,
+                  "offTime" : 1600,
+                  "count"   : 1
+              }
+          ],
+          "count" : 1
+      }
+  ]
+
+
+EndRaid.json
+[
+    {
+        "name": "End Raid",
+        "macro": [
+            {
+                "button"  : "b",
+                "onTime"  : 120,
+                "offTime" : 600,
+                "count"   : 1
+            },
+            {
+                "button"  : "a",
+                "onTime"  : 120,
+                "offTime" : 700,
+                "count"   : 1
+            }
+        ],
+        "count" : 1
+    }
+]

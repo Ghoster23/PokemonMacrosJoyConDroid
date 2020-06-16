@@ -1,6 +1,6 @@
 [
     {
-        "name": "Advance Day US",
+        "name": "Advance Day CHN",
         "macro": [
             {
                 "button"  : "a",
@@ -12,7 +12,7 @@
                 "button"  : "left",
                 "onTime"  : 120,
                 "offTime" : 240,
-                "count"   : 5
+                "count"   : 4
             },
             {
                 "button"  : "up",
@@ -22,7 +22,7 @@
             },
             {
                 "button"  : "right",
-                "onTime"  : 600,
+                "onTime"  : 480,
                 "offTime" : 200,
                 "count"   : 1
             },

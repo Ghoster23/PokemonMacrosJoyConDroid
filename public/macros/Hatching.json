@@ -1,0 +1,59 @@
+[
+    {
+        "name"  : "Hatch Run Around",
+        "macro" : [
+            {
+                "button"  : "plus",
+                "onTime"  : 120,
+                "offTime" : 360,
+                "count"   : 1
+            },
+            {
+                "button"   : "left_stick_dir",
+                "onTime"   : 3000,
+                "offTime"  : 120,
+                "count"    : 1,
+                "strength" : 100,
+                "angle"    : 53
+            },
+            {
+                "button"   : "right_stick_dir",
+                "onTime"   : 30000,
+                "offTime"  : 0,
+                "count"    : 1,
+                "strength" : 100,
+                "angle"    : 180,
+                "block"    : false
+            },
+            {
+                "button"   : "left_stick_dir",
+                "onTime"   : 30000,
+                "offTime"  : 120,
+                "count"    : 1,
+                "strength" : 100,
+                "angle"    : 90
+            }
+        ],
+        "count" : 1
+    },
+    {
+        "name"  : "Hatch Animations",
+        "macro" : [
+            {
+                "button"  : "b",
+                "onTime"  : 120,
+                "offTime" : 240,
+                "count"   : 50
+            },
+            {
+                "button"   : "left_stick_dir",
+                "onTime"   : 840,
+                "offTime"  : 120,
+                "count"    : 1,
+                "strength" : 100,
+                "angle"    : 90
+            }
+        ],
+        "count" : 1
+    }
+]

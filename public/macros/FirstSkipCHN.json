@@ -1,0 +1,92 @@
+[
+    {
+        "name": "First day skip CHN",
+        "macro": [
+            {
+                "button"  : "home",
+                "onTime"  : 120,
+                "offTime" : 1200,
+                "count"   : 1
+            },
+            {
+                "button"  : "down",
+                "onTime"  : 120,
+                "offTime" : 120,
+                "count"   : 1
+            },
+            {
+                "button"  : "right",
+                "onTime"  : 120,
+                "offTime" : 120,
+                "count"   : 4
+            },
+            {
+                "button"  : "a",
+                "onTime"  : 120,
+                "offTime" : 720,
+                "count"   : 1
+            },
+            {
+                "button"  : "down",
+                "onTime"  : 1680,
+                "offTime" : 120,
+                "count"   : 1
+            },
+            {
+                "button"  : "a",
+                "onTime"  : 120,
+                "offTime" : 600,
+                "count"   : 1
+            },
+            {
+                "button"  : "down",
+                "onTime"  : 120,
+                "offTime" : 120,
+                "count"   : 4
+            },
+            {
+                "button"  : "a",
+                "onTime"  : 120,
+                "offTime" : 600,
+                "count"   : 1
+            },
+            {
+                "button"  : "down",
+                "onTime"  : 600,
+                "offTime" : 120,
+                "count"   : 1
+            },
+            {
+                "button"  : "a",
+                "onTime"  : 120,
+                "offTime" : 240,
+                "count"   : 1
+            },
+            {
+                "button"  : "right",
+                "onTime"  : 120,
+                "offTime" : 240,
+                "count"   : 2
+            },
+            {
+                "button"  : "up",
+                "onTime"  : 120,
+                "offTime" : 240,
+                "count"   : 1
+            },
+            {
+                "button"  : "right",
+                "onTime"  : 480,
+                "offTime" : 200,
+                "count"   : 1
+            },
+            {
+                "button"  : "a",
+                "onTime"  : 120,
+                "offTime" : 240,
+                "count"   : 1
+            }
+        ],
+        "count": 1
+    }
+]

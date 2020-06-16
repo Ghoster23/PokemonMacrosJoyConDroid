@@ -1,0 +1,26 @@
+[
+    {
+        "name": "Open Box",
+        "macro": [
+            {
+                "button"  : "x",
+                "onTime"  : 120,
+                "offTime" : 840,
+                "count"   : 1
+            },
+            {
+                "button"  : "a",
+                "onTime"  : 120,
+                "offTime" : 1600,
+                "count"   : 1
+            },
+            {
+                "button"  : "r",
+                "onTime"  : 120,
+                "offTime" : 1440,
+                "count"   : 1
+            }
+        ],
+        "count" : 1
+    }
+]

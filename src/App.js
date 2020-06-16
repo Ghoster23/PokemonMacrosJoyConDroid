@@ -5,8 +5,6 @@ import './App.css';
 // - Constants and Globals
 //
 
-const MonthLength = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-
 const MacroStates = {
 	INACTIVE: 0,
 	PLAYING:  1,
@@ -18,26 +16,8 @@ const MacroStates = {
 // - AUX Functions
 //
 
-function arrayFindIndex(array, toFind) {
-	var found = -1;
-
-	array.forEach((item, i) => {
-		if(item === toFind) found = i;
-	});
-
-	return found;
-}
-
-function ConvertDate(date) {
-	let day   = date.getDate().toString();
-	if(day <= 9) day = "0" + day;
-
-	let month = (date.getMonth() + 1).toString();
-	if(date.getMonth() < 9) month = "0" + month;
-
-	let year  = date.getFullYear().toString();
-
-	return year + "-" + month + "-" + day;
+function degToRad(angle) {
+	return angle * (Math.PI / 180);
 }
 
 async function LoadJson(path) {
@@ -46,6 +26,23 @@ async function LoadJson(path) {
 	res = await fetch(path).then(response => { return response.json(); } );
 
 	return res;
+}
+
+function generateButtonPress(button, onTime, offTime, count) {
+	return [
+		{
+			name: "Press " + button,
+			macro: [
+				{
+					button  : button,
+					onTime  : onTime,
+					offTime : offTime,
+					count   : 1
+				}
+			],
+			count: count
+		}
+	];
 }
 
 //
@@ -102,8 +99,8 @@ function KeyLog(props) {
 		<div key = {props.ind} className = "key-log">
 			<b className = "key-log-cell"> {props.index} </b>
 			<b className = "key-log-cell"> {props.pressedKey} </b>
-			<b className = "key-log-cell"> {props.onTime} </b>
-			<b className = "key-log-cell"> {props.offTime} </b>
+			<b className = "key-log-cell"> {props.start} </b>
+			<b className = "key-log-cell"> {props.duration} </b>
 		</div>
 	);
 }
@@ -127,34 +124,6 @@ class CheckBox extends React.Component {
 	}
 }
 
-/*
-class DateInput extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = {};
-
-		this.handleChange = this.handleChange.bind(this);
-	}
-
-	handleChange(event) {
-		if(event.target.value === "") {
-			this.props.onChange(ConvertDate(new Date()));
-			return;
-		}
-
-		this.props.onChange(event.target.value);
-	}
-
-	render() {
-		return (
-			<input type = "date" className = "date-input"
-			readOnly = {this.props.readonly}
-			value = {this.props.date} onChange = {this.handleChange}/>
-		);
-	}
-}
-*/
-
 class IntegerInput extends React.Component {
 	constructor(props) {
 		super(props);
@@ -169,7 +138,9 @@ class IntegerInput extends React.Component {
 			return;
 		}
 
-		this.props.onChange(parseInt(event.currentTarget.value));
+		let value = Math.min(event.currentTarget.value, this.props.max);
+
+		this.props.onChange(parseInt(value));
 	}
 
 	render() {
@@ -256,8 +227,8 @@ class ParameterInput extends React.Component {
 							</label>
 							<div className = "parameter">
 								<DropDownList id = "dateFormat" name = "date-format"
-									value = {params.dateFormat}
-									options = {["World", "US"]}
+									value    = {params.dateFormat}
+									options  = {["World", "US", "Chinese"]}
 									onChange = {value => this.props.eventHandler("dateFormat", value)}
 								/>
 							</div>
@@ -299,7 +270,7 @@ class ParameterInput extends React.Component {
 							<div className = "parameter">
 								<DropDownList id = "dateFormat" name = "date-format"
 									value = {params.dateFormat}
-									options = {["World", "US"]}
+									options = {["World", "US", "Chinese"]}
 									onChange = {value => this.props.eventHandler("dateFormat", value)}
 								/>
 							</div>
@@ -331,6 +302,48 @@ class ParameterInput extends React.Component {
 									value = {params.waitTime}
 									onChange = {value => this.props.eventHandler("waitTime", value)}
 									min = "2" max = "600"
+								/>
+							</div>
+						</div>
+					</div>
+				);
+
+			case "Egg Hatcher":
+				return (
+					<div className = "macro-parameters" id = "EggHatcherParams">
+						<div className = "parameters-entry">
+							<label className = "parameter-label">
+								Egg Cycles
+							</label>
+							<div className = "parameter">
+								<DropDownList id = "eggCycles" name = "egg-cycles"
+									value    = {params.eggCycles.toString()}
+									options  = {["5", "10", "15", "20", "25", "30", "35", "40"]}
+									onChange = {value => this.props.eventHandler("eggCycles", value)}
+								/>
+							</div>
+						</div>
+						<div className = "parameters-entry">
+							<label className = "parameter-label">
+								Hatching Ability
+							</label>
+							<div className = "parameter">
+								<CheckBox id = "hasHatchAbility" name = "hatch-ability"
+									checked  = {params.ability}
+									paramKey = "ability"
+									onChange = {this.props.eventHandler}
+								/>
+							</div>
+						</div>
+						<div className = "parameters-entry">
+							<label className = "parameter-label">
+								Eggs in Box
+							</label>
+							<div className = "parameter">
+								<IntegerInput id = "eggsInBox" name = "eggs-in-box"
+									value = {params.eggsInBox}
+									onChange = {value => this.props.eventHandler("eggsInBox", value)}
+									min = "1" max = "30"
 								/>
 							</div>
 						</div>
@@ -392,139 +405,25 @@ function coroutine(f, args) {
 	}
 }
 
-class SimpleDate {
-	constructor(str) {
-		this.day   = 0;
-		this.month = 0;
-		this.year  = 0;
-
-		this.setFromString(str);
-	}
-
-	isLeapYear() {
-		if(this.year % 4 === 0) {
-			if(this.year % 100 !== 0 || this.year % 400 === 0) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	increment(days) {
-		this.day += days;
-
-		let len = MonthLength[this.month];
-
-		let rem = this.day - len;
-		if(this.month === 1 && !this.isLeapYear()) {
-			rem += 1;
-		}
-
-		while(rem > 0) {
-			this.day = rem;
-
-			this.month += 1;
-
-			if(this.month === 12) {
-				this.year += 1;
-				this.month = 0;
-			}
-
-			len = MonthLength[this.month];
-
-			rem = this.day - len;
-			if(this.month === 1 && !this.isLeapYear()) {
-				rem += 1;
-			}
-		}
-	}
-
-	decrement(days) {
-		this.day -= days;
-
-		while(this.day <= 0) {
-			this.month -= 1;
-
-			if(this.month < 0) {
-				this.month = 11;
-				this.year -= 1;
-			}
-
-			let len = MonthLength[this.month];
-			if(this.month === 1 && !this.isLeapYear()) len -= 1;
-
-			this.day += len;
-		}
-	}
-
-	dayDifference(other) {
-		var date1 = new Date(this.toString());
-		var date2 = new Date(other.toString());
-
-		var diff = date2.getTime() - date1.getTime();
-
-		return diff / (1000 * 60 * 60 * 24);
-	}
-
-	daysToNextMonth() {
-		let len = MonthLength[this.month];
-		if(this.month === 1 && !this.isLeapYear()) len -= 1;
-
-		return len - this.day + 1;
-	}
-
-	setFromString(str = "2020-01-01") {
-		this.year  = parseInt(str.substr(0, 4));
-		this.month = parseInt(str.substr(5, 2)) - 1;
-		this.day   = parseInt(str.substr(8, 2));
-	}
-
-	toString() {
-		let day   = this.day.toString();
-		if(this.day <= 9) day = "0" + day;
-
-		let month = (this.month + 1).toString();
-		if(this.month < 9) month = "0" + month;
-
-		let year  = this.year.toString();
-
-		return year + "-" + month + "-" + day;
-	}
-
-	compare(other) {
-		let oYear = other.year;
-
-		if(oYear === this.year) {
-			let oMonth = other.month;
-
-			if(oMonth === this.month) {
-				return other.day - this.day;
-			}
-			else {
-				return oMonth - this.month;
-			}
-		}
-		else {
-			return oYear - this.year;
-		}
-	}
-}
-
 class JSONManeger {
 	constructor() {
 		this.segments = {
-			FstSkip     : {filename: "FirstSkip.json",                object: ""},
-			FstSkipUS   : {filename: "FirstSkipUS.json",              object: ""},
-			AdvDay      : {filename: "AdvanceDay.json",               object: ""},
-			AdvDayUS    : {filename: "AdvanceDayUS.json",             object: ""},
-			LotoID      : {filename: "LotoID.json",                   object: ""},
-			Return      : {filename: "ReturnToGameFromSettings.json", object: ""},
-			Universal   : {filename: "UniversalSkip.json",            object: ""},
-			UniversalUS : {filename: "UniversalSkipUS.json",          object: ""},
-			SelectInBox : {filename: "SelectInBox.json",              object: ""},
-			StartWonder : {filename: "StartWonderTrade.json",         object: ""},
-			EndWonder   : {filename: "ConcludeWonderTrade.json",      object: ""}
+			FstSkip      : {filename: "FirstSkip.json",           object: ""},
+			FstSkipUS    : {filename: "FirstSkipUS.json",         object: ""},
+			FstSkipCHN   : {filename: "FirstSkipCHN.json",        object: ""},
+			AdvDay       : {filename: "AdvanceDay.json",          object: ""},
+			AdvDayUS     : {filename: "AdvanceDayUS.json",        object: ""},
+			AdvDayCHN    : {filename: "AdvanceDayCHN.json",       object: ""},
+			LotoID       : {filename: "LotoID.json",              object: ""},
+			Universal    : {filename: "UniversalSkip.json",       object: ""},
+			UniversalUS  : {filename: "UniversalSkipUS.json",     object: ""},
+			UniversalCHN : {filename: "UniversalSkipCHN.json",    object: ""},
+			OpenBox      : {filename: "OpenBox.json",             object: ""},
+			SelectInBox  : {filename: "SelectInBox.json",         object: ""},
+			PlaceInBox   : {filename: "PlaceInBox.json",          object: ""},
+			StartWonder  : {filename: "StartWonderTrade.json",    object: ""},
+			EndWonder    : {filename: "ConcludeWonderTrade.json", object: ""},
+			Hatching     : {filename: "Hatching.json",            object: ""}
 		};
 
 		var entries = Object.entries(this.segments);
@@ -679,6 +578,10 @@ class TimeSkipMacroBuilder extends MacroBuilder {
 				case 1: // US
 					this.currentFormat = "US";
 				break;
+
+				case 2: // Chinese
+					this.currentFormat = "CHN";
+				break;
 			}
 
 			return true;
@@ -707,20 +610,27 @@ class TimeSkipMacroBuilder extends MacroBuilder {
 
 		this.InitMacro();
 
-		var count = this.parameters.daysToAdvance;
+		var count = this.parameters.daysToAdvance - 1;
 
 		// If more than 1 skip
-		if(count > 1) {
-			let adjust = Math.floor(count / 31);
+		if(count > 0) {
+			// Calculate the number of macro repetitions
+			let months = Math.floor(count / 31);
+			let total  = count + months + Math.floor(months / 31);
 
-			if(adjust >= 31) {
-				adjust += Math.floor(adjust / 31);
+			// Advance the adjustment
+			while(total > 0) {
+				this.AdvanceDay(Math.min(31, total));
+
+				total -= 31;
+
+				if(total > 0) {
+					this.concatToMacro(generateButtonPress("down", 120, 240, 2));
+				}
 			}
-
-			this.AdvanceDay((count - 1) + adjust);
 		}
 
-		this.concatToMacro(this.getMacro("Return"));
+		this.concatToMacro(generateButtonPress("home", 100, 1000, 2));
 
 		this.macro = new Macro(this.name, this.icon, this.macroJSON);
 
@@ -743,8 +653,9 @@ class LotoIDMacroBuilder extends MacroBuilder {
 		this.onDateFormatChange = this.onDateFormatChange.bind(this);
 
 		this.paramHandlers = {
-			attempts  : this.onAttemptsChange,
-			getFirst  : this.onGetFirstChange
+			attempts   : this.onAttemptsChange,
+			getFirst   : this.onGetFirstChange,
+			dateFormat : this.onDateFormatChange
 		};
 
 		var text1 = (
@@ -807,6 +718,10 @@ class LotoIDMacroBuilder extends MacroBuilder {
 				case 1: // US
 					this.currentFormat = "US";
 				break;
+
+				case 2: // Chinese
+					this.currentFormat = "CHN";
+				break;
 			}
 
 			return true;
@@ -816,29 +731,6 @@ class LotoIDMacroBuilder extends MacroBuilder {
 	}
 
 	// Build Macro
-	AdvanceDate(currentDate) {
-		var tomorrow = new SimpleDate(currentDate.toString());
-		tomorrow.increment(1);
-
-		// If the day after the start is in the next Month
-		if(currentDate.month < tomorrow.month) {
-			// If the day after the start is in the next Year
-			if(currentDate.year < tomorrow.year) {
-				this.concatToMacro(this.getMacro("FstSkipY"));  // Advance the Day, Month and Year
-			}
-
-			// It is in the same Year
-			else {
-				this.concatToMacro(this.getMacro("FstSkipM"));  // Advance the Day and Month
-			}
-		}
-
-		// It is in the same Month
-		else {
-			this.concatToMacro(this.getMacro("FstSkipD"));
-		}
-	}
-
 	build() {
 		if(!this.jsonManager.loadConcluded) return null;
 
@@ -857,7 +749,7 @@ class LotoIDMacroBuilder extends MacroBuilder {
 			this.concatToMacro(this.getMacro("Universal" + this.currentFormat));
 			counter++;
 
-			this.concatToMacro(this.getMacro("Return"));
+			this.concatToMacro(generateButtonPress("home", 100, 1000, 2));
 
 			this.concatToMacro(this.getMacro("LotoID"));
 		}
@@ -951,11 +843,25 @@ class WonderBoxMacroBuilder extends MacroBuilder {
 	}
 
 	// Build Macro
-	SelectInBox(row, column) {
+	SelectInBox(column, row) {
 		var segments = this.getMacro("SelectInBox");
 
-		segments[0].macro[0].count = row;
-		segments[0].macro[1].count = column;
+		let dx = column;
+		let dy = row;
+
+		if(dx > 0) {
+			segments[0].macro[0].count = dx;
+		}
+		else {
+			segments[0].macro[1].count = -1 * dx;
+		}
+
+		if(dy > 0) {
+			segments[0].macro[2].count = dy;
+		}
+		else {
+			segments[0].macro[3].count = -1 * dy;
+		}
 
 		this.concatToMacro(segments);
 	}
@@ -981,7 +887,7 @@ class WonderBoxMacroBuilder extends MacroBuilder {
 			for(column = 0; column < 6; column++) {
 				this.concatToMacro(this.getMacro("StartWonder"));
 
-				this.SelectInBox(row, column);
+				this.SelectInBox(column, row);
 
 				this.ConcludeTrade();
 
@@ -1002,6 +908,198 @@ class WonderBoxMacroBuilder extends MacroBuilder {
 	}
 }
 
+class EggHatcherMacroBuilder extends MacroBuilder {
+	constructor(jsonM) {
+		super(jsonM, "Egg Hatcher", "./images/egghatcher_icon.png");
+
+		this.parameters.eggCycles = 5;
+		this.parameters.ability   = false;
+		this.parameters.eggCharm  = false;
+		this.parameters.eggsInBox = 1;
+
+		this.onEggCyclesChange   = this.onEggCyclesChange.bind(this);
+		this.onHasAbilityChange  = this.onHasAbilityChange.bind(this);
+		this.onEggsInBoxChange   = this.onEggsInBoxChange.bind(this);
+
+		this.paramHandlers = {
+			eggCycles : this.onEggCyclesChange,
+			ability   : this.onHasAbilityChange,
+			eggsInBox : this.onEggsInBoxChange
+		};
+
+		var text1 = (
+			<p>
+				<b>1-</b> Open your PC and navigate to the Box with the eggs. Make sure that the box was filled from up to down, left to right.
+				This means the eggs should be placed column per column not row per row as is normal, if the box is full this doesn't matter.
+				<br/>
+				<br/>
+				<b>2-</b> You must leave the <b>Pokémon</b> option selected when exiting the game's menu.
+				<br/>
+				<br/>
+				<b>3-</b> When starting the macro, the <b>Player Character</b> must be near the <b>Nursery</b> at the Wild Area and not on the bike.
+				<br/>
+				<br/>
+				<b>4-</b> Set the <b>Egg Cycles</b> parameter to how many cycles the egg takes to hatch, this can be checked on sites like Bulbapedia.
+				<br/>
+				<br/>
+				<b>5-</b> Check the <b>Hatch Ability</b> box if the first pokemon in the party has one of the following abilities: Flame Body, Magma Armor or Steam Engine.
+				<br/>
+				<br/>
+				<b>6-</b> Set the <b>Eggs in Box</b> parameter to how many eggs you have in the box to be hatched.
+			</p>
+		);
+
+		this.info = [
+			{
+				title: "SetUp",
+				text: text1
+			}
+		];
+	}
+
+	// Parameter Handlers
+	onEggCyclesChange(cycles) {
+		cycles = 5 * (parseInt(cycles) + 1);
+
+		if(this.parameters.eggCycles !== cycles) {
+			this.parameters.eggCycles = cycles;
+
+			return true;
+		}
+
+		return false;
+	}
+
+	onHasAbilityChange(bool) {
+		if(this.parameters.ability !== bool) {
+			this.parameters.ability = bool;
+
+			return true;
+		}
+
+		return false;
+	}
+
+	onEggsInBoxChange(count) {
+		if(this.parameters.eggsInBox !== count) {
+			this.parameters.eggsInBox = count;
+
+			return true;
+		}
+
+		return false;
+	}
+
+	// Build Macro
+	InBoxSegment(type, cColumn, cRow, tColumn, tRow) {
+		var segments = this.getMacro(type + "InBox");
+
+		let dx = tColumn - cColumn;
+		let dy = tRow - cRow;
+
+		if(dx > 0) {
+			segments[0].macro[0].count = dx;
+		}
+		else {
+			segments[0].macro[1].count = -1 * dx;
+		}
+
+		if(dy > 0) {
+			segments[0].macro[2].count = dy;
+		}
+		else {
+			segments[0].macro[3].count = -1 * dy;
+		}
+
+		if(type === "Select") {
+			segments[0].macro[6].offTime = 600;
+		}
+
+		this.concatToMacro(segments);
+	}
+
+	HatchSegment(eggsInParty) {
+		let segments = this.getMacro("Hatching");
+
+		// Calculate steps to hatch egg
+		let cycles = this.parameters.eggCycles;
+		if(this.parameters.ability) cycles = cycles / 2;
+
+		// Calculate time to hatch
+		let time = cycles * 6400;
+
+		segments[0].macro[2].onTime = time;
+		segments[0].macro[3].onTime = time;
+
+		segments[1].count = eggsInParty;
+
+		this.concatToMacro(segments);
+	}
+
+	build() {
+		if(!this.jsonManager.loadConcluded) return null;
+
+		this.macroJSON = []; // Clear Macro JSON
+
+		let count  = 0;
+
+		let sX = 0;
+
+		while(count < this.parameters.eggsInBox) {
+			this.concatToMacro(this.getMacro("OpenBox"));
+
+			// Get Eggs into the Party
+			let sY = 0;
+
+			let cX = 0;
+			let cY = 0;
+
+			while(sY < 5 && count < this.parameters.eggsInBox) {
+				this.InBoxSegment("Select", cX, cY, sX, sY);
+
+				cX = sX;
+				cY = sY;
+
+				this.InBoxSegment("Place", cX, cY, -1, 1 + sY);
+
+				cX = -1;
+				cY = 1 + sY;
+
+				sY++;
+
+				count++;
+			}
+
+			sX++;
+
+			// Exit PC to Menu
+			this.concatToMacro(generateButtonPress(   "b", 180, 1480, 1));
+			this.concatToMacro(generateButtonPress(   "b", 180, 1720, 1));
+
+			// Select Map
+			this.concatToMacro(generateButtonPress("left", 180,  240, 1));
+			this.concatToMacro(generateButtonPress("down", 180,  240, 1));
+
+			// Recenter at Nursery
+			this.concatToMacro(generateButtonPress(   "a", 180, 2400, 3));
+
+			// Hatch Eggs
+			this.HatchSegment(sY);
+
+			// Select the PC
+			this.concatToMacro(generateButtonPress(    "x", 180,  840, 1));
+			this.concatToMacro(generateButtonPress("right", 180,  240, 1));
+			this.concatToMacro(generateButtonPress(   "up", 180,  240, 1));
+			this.concatToMacro(generateButtonPress(    "b", 180, 1720, 1));
+			this.concatToMacro(generateButtonPress( "plus", 180, 1200, 1));
+		}
+
+		this.macro = new Macro(this.name, this.icon, this.macroJSON);
+
+		return this.macro;
+	}
+}
+
 //
 // - APP Components
 //
@@ -1013,8 +1111,9 @@ class Macro {
 
 		this.state = MacroStates.INACTIVE;
 
+		this.commands = [];
+
 		this.onWait = false;
-		this.waitTimeout = null;
 
 		this.runner = null;
 
@@ -1043,7 +1142,7 @@ class Macro {
 	}
 
 	progress() {
-		if(this.totalSteps === 0) return 0;
+		if(this.totalSteps === 0) return 1;
 
 		return this.currentOverallStep / this.totalSteps;
 	}
@@ -1082,20 +1181,23 @@ class Macro {
 						// Get current Step
 						var step = steps[k];
 
-						// Make the response to the App
-						var res = { button : step.button, pressed : true, time : 0};
+						// Make commands
+						let command = this.makeCommand(step.button,  true, step.strength, step.angle);
+						let reset   = this.makeCommand(step.button, false,             0,          0);
+
+						// Check if input blocks progress
+						let block = step.block === undefined || step.block === true;
 
 						// For each repetition of the Step
 						var l = 0;
 						for(l = 0; l < step.count; l++) {
-							res.pressed = true; // Signal that the button is pressed
+							this.commands.push(command);
 
-							// Set timer for the duration of the button press
-							this.wait(Math.max(step.onTime, 20));
+							// Set timed command
+							this.timedCommand(reset, block, Math.max(step.onTime, 20));
 
-							res.time = step.onTime;
-
-							yield res;
+							yield this.commands;
+							this.commands = [];
 
 							// Wait
 							while(this.onWait) {
@@ -1104,14 +1206,16 @@ class Macro {
 								this.state = info.state;
 							}
 
-							res.pressed = false; // Signal the the button is not pressed
+							// If there is a buffer before the next button press
+							if(block === true && step.offTime > 0) {
+								this.onWait = true;
 
-							// Set timer for the wait before pressing the next button
-							this.wait(Math.max(step.offTime, 20));
+								// Set timer for the wait before pressing the next button
+								this.timedCommand(null, block, Math.max(step.offTime, 20));
+							}
 
-							res.time = step.offTime;
-
-							yield res;
+							yield this.commands;
+							this.commands = [];
 
 							// Wait for timer to elapse and to not be paused
 							while(this.onWait || this.state === MacroStates.PAUSED) {
@@ -1132,13 +1236,29 @@ class Macro {
 		this.runner = coroutine(f, this);
 	}
 
-	wait(duration) {
-		this.waitTimeout = setTimeout(this.resume, duration, this);
-		this.onWait = true;
+	makeCommand(button, pressed, strength, angle) {
+		return {
+			button   : button,
+			pressed  : pressed,
+			strength : strength,
+			angle    : angle
+		};
 	}
 
-	resume(obj) {
-		obj.onWait = false;
+	timedCommand(command, blocking, duration) {
+		setTimeout(this.issueCommand, duration, this, command, blocking); // New Timer
+
+		// Block Macro progress
+		this.onWait = blocking;
+	}
+
+	issueCommand(obj, command, blocking) {
+		if(command !== null) {
+			obj.commands.push(command);
+		}
+
+		// If step was blocking, unblock
+		if(blocking) obj.onWait = false;
 	}
 
 	reset() {
@@ -1191,6 +1311,7 @@ class MacroPlayer {
 		this.builders[0] = new TimeSkipMacroBuilder(this.jsonManager);
 		this.builders[1] = new LotoIDMacroBuilder(this.jsonManager);
 		this.builders[2] = new WonderBoxMacroBuilder(this.jsonManager);
+		this.builders[3] = new EggHatcherMacroBuilder(this.jsonManager);
 
 		let macroCount = this.builders.length;
 
@@ -1423,8 +1544,10 @@ class KeyLogger {
 			b               : {pressed : false, pendingLog: null},
 			x               : {pressed : false, pendingLog: null},
 			y               : {pressed : false, pendingLog: null},
+			l               : {pressed : false, pendingLog: null},
 			lsl             : {pressed : false, pendingLog: null},
 			lsr             : {pressed : false, pendingLog: null},
+			r               : {pressed : false, pendingLog: null},
 			rsl             : {pressed : false, pendingLog: null},
 			rsr             : {pressed : false, pendingLog: null},
 			plus            : {pressed : false, pendingLog: null},
@@ -1439,6 +1562,8 @@ class KeyLogger {
 			right_stick_dir : {pressed : false, pendingLog: null},
 			home            : {pressed : false, pendingLog: null}
 		};
+
+		this.startTime = 0;
 
 		this.log = [];
 		this.log_count = 0;
@@ -1450,8 +1575,10 @@ class KeyLogger {
 			b               : {pressed : false, pendingLog: null},
 			x               : {pressed : false, pendingLog: null},
 			y               : {pressed : false, pendingLog: null},
+			l               : {pressed : false, pendingLog: null},
 			lsl             : {pressed : false, pendingLog: null},
 			lsr             : {pressed : false, pendingLog: null},
+			r               : {pressed : false, pendingLog: null},
 			rsl             : {pressed : false, pendingLog: null},
 			rsr             : {pressed : false, pendingLog: null},
 			plus            : {pressed : false, pendingLog: null},
@@ -1466,6 +1593,8 @@ class KeyLogger {
 			right_stick_dir : {pressed : false, pendingLog: null},
 			home            : {pressed : false, pendingLog: null}
 		};
+
+		this.startTime = 0;
 
 		this.log = [];
 		this.log_count = 0;
@@ -1479,7 +1608,11 @@ class KeyLogger {
 			if(info.pressed === false) {
 				info.pressed = true;
 
-				info.pendingLog = this.addLogEntry(key, time);
+				if(this.startTime === 0) {
+					this.startTime = time;
+				}
+
+				info.pendingLog = this.addLogEntry(key, time - this.startTime);
 			}
 
 			this.keys[key] = info;
@@ -1487,7 +1620,7 @@ class KeyLogger {
 	}
 
 	addLogEntry(key, time) {
-		let entry = {index: this.log_count, key: key, onTime: time, offTime: ''}
+		let entry = {index: this.log_count, key: key, start: time, duration: 0}
 
 		this.log[this.log_count] = entry;
 
@@ -1506,7 +1639,7 @@ class KeyLogger {
 				let entry = info.pendingLog;
 				info.pendingLog = null;
 
-				entry.offTime = time;
+				entry.duration = time - entry.start - this.startTime;
 
 				this.log[entry.index] = entry;
 			}
@@ -1527,7 +1660,9 @@ class KeyLogger {
 		return pressedKeys;
 	}
 
-	update(key, pressed, time) {
+	update(key, pressed) {
+		let time = (new Date()).getTime();
+
 		// If key is being pressed
 		if(pressed) {
 			this.pressKey(key, time);
@@ -1576,7 +1711,7 @@ class KeyLogger {
 				var l = this.log[this.log_count - (i + 1)];
 				keyLogs.push(
 					<KeyLog key = {"keylog_" + i} index = {l.index.toString()}
-						pressedKey = {l.key} onTime = {l.onTime} offTime = {l.offTime}/>
+						pressedKey = {l.key} start = {l.start} duration = {l.duration}/>
 				);
 			}
 		}
@@ -1633,9 +1768,26 @@ class App extends Component {
 
 		this.setState(this.macroPlayer.getMacroState());
 
+		// If there was an Update
 		if(res !== undefined) {
-			this.handleSwitchKeys(res.button, res.pressed);
-			this.keyLogger.update(res.button, res.pressed, res.time);
+			// Iterate the Log
+			let i;
+			for(i = 0; i < res.length; i++) {
+				let command = res[i];
+
+				// If it was a JoyStick Update
+				if(command.button === "right_stick_dir" ||
+					 command.button === "left_stick_dir") {
+					this.handleSwitchJoySticks(command.button, command.strength, command.angle);
+				}
+
+				// If it was a Key Update
+				else {
+					this.handleSwitchKeys(command.button, command.pressed);
+				}
+
+				this.keyLogger.update(command.button, command.pressed);
+			}
 		}
 	}
 
@@ -1659,8 +1811,17 @@ class App extends Component {
 				if(this.macroPlayer.reset()) {
 					var pressedKeys = this.keyLogger.getPressed();
 
-					for(let key in pressedKeys) {
-						this.handleSwitchKeys(key, false);
+					let i;
+					for(i = 0; i < pressedKeys.length; i++) {
+						let key = pressedKeys[i];
+
+						if(key === "left_stick_dir" ||
+							 key === "right_stick_dir") {
+							this.handleSwitchJoySticks(key, 0, 0);
+						}
+						else {
+							this.handleSwitchKeys(key, false);
+						}
 					}
 
 					this.keyLogger.clear();
@@ -1684,6 +1845,20 @@ class App extends Component {
 
 	parameterChange(key, value) {
 		this.macroPlayer.changeParameter(key, value);
+	}
+
+	handleSwitchJoySticks(joystick, strength, angle) {
+		let rads = degToRad(angle);
+
+		if(window.joyconJS === undefined) return;
+
+		if(joystick === "right_stick_dir") {
+			window.joyconJS.onRightJoystick(strength, rads);
+		}
+
+		if(joystick === "left_stick_dir") {
+			window.joyconJS.onLeftJoystick(strength, rads);
+		}
 	}
 
 	handleSwitchKeys(name, pressed) {
@@ -1713,6 +1888,10 @@ class App extends Component {
 			window.joyconJS.onLeft(pressed);
 		}
 
+		if(name === "l") {
+			window.joyconJS.onL(pressed);
+		}
+
 		if(name === "lsl") {
 			window.joyconJS.onLeftSL(pressed);
 		}
@@ -1739,6 +1918,10 @@ class App extends Component {
 
 		if(name === "y") {
 			window.joyconJS.onY(pressed);
+		}
+
+		if(name === "r") {
+			window.joyconJS.onR(pressed);
 		}
 
 		if(name === "rsl") {
