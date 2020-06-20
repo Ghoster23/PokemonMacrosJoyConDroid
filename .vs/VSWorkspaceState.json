@@ -2,8 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\public",
+    "\\public\\macros",
     "\\src"
   ],
-  "SelectedNode": "\\src\\App.js",
+  "SelectedNode": "\\public\\macros\\Hatching.json",
   "PreviewInSolutionExplorer": false
 }

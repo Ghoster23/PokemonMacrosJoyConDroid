@@ -45,6 +45,27 @@ function generateButtonPress(button, onTime, offTime, count) {
 	];
 }
 
+function generateJoystickPush(side, onTime, offTime, strength, angle) {
+	if(side != "left" && side != "right") return [];
+
+	return [
+		{
+			name: "Push " + side + " analog stick",
+			macro: [
+				{
+					button   : side + "_stick_dir",
+					onTime   : onTime,
+					offTime  : offTime,
+					count    : 1,
+					strength : strength,
+					angle    : angle
+				}
+			],
+			count: 1
+		}
+	];
+}
+
 //
 // - React Components
 //
@@ -1085,6 +1106,147 @@ class EggHatcherMacroBuilder extends MacroBuilder {
 
 			// Hatch Eggs
 			this.HatchSegment(sY);
+
+			// Select the PC
+			this.concatToMacro(generateButtonPress(    "x", 180,  840, 1));
+			this.concatToMacro(generateButtonPress("right", 180,  240, 1));
+			this.concatToMacro(generateButtonPress(   "up", 180,  240, 1));
+			this.concatToMacro(generateButtonPress(    "b", 180, 1720, 1));
+			this.concatToMacro(generateButtonPress( "plus", 180, 1200, 1));
+		}
+
+		this.macro = new Macro(this.name, this.icon, this.macroJSON);
+
+		return this.macro;
+	}
+}
+
+class BreedingMacroBuilder extends MacroBuilder {
+	constructor(jsonM) {
+		super(jsonM, "Breeding", "./images/egghatcher_icon.png");
+
+		this.parameters.eggCycles = 5;
+		this.parameters.ability   = false;
+		this.parameters.eggCharm  = false;
+
+		this.onEggCyclesChange   = this.onEggCyclesChange.bind(this);
+		this.onHasAbilityChange  = this.onHasAbilityChange.bind(this);
+
+		this.paramHandlers = {
+			eggCycles : this.onEggCyclesChange,
+			ability   : this.onHasAbilityChange
+		};
+
+		var text1 = (
+			<p>
+				<b>1-</b> Open your PC and navigate to the Box with the eggs. Make sure that the box was filled from up to down, left to right.
+				This means the eggs should be placed column per column not row per row as is normal, if the box is full this doesn't matter.
+				<br/>
+				<br/>
+				<b>2-</b> You must leave the <b>Pokémon</b> option selected when exiting the game's menu.
+			</p>
+		);
+
+		this.info = [
+			{
+				title: "SetUp",
+				text: text1
+			}
+		];
+	}
+
+	// Parameter Handlers
+	onEggCyclesChange(cycles) {
+		cycles = 5 * (parseInt(cycles) + 1);
+
+		if(this.parameters.eggCycles !== cycles) {
+			this.parameters.eggCycles = cycles;
+
+			return true;
+		}
+
+		return false;
+	}
+
+	onHasAbilityChange(bool) {
+		if(this.parameters.ability !== bool) {
+			this.parameters.ability = bool;
+
+			return true;
+		}
+
+		return false;
+	}
+
+	// Build Macro
+	HatchSegment() {
+		let segments = this.getMacro("Hatching");
+
+		// Calculate steps to hatch egg
+		let cycles = this.parameters.eggCycles;
+		if(this.parameters.ability) cycles = cycles / 2;
+
+		// Calculate time to hatch
+		let time = cycles * 6400;
+
+		segments[0].macro[2].onTime = time;
+		segments[0].macro[3].onTime = time;
+
+		segments[1].count = 1;
+
+		this.concatToMacro(segments);
+	}
+
+	BackToNursery() {
+		// Open Menu
+		this.concatToMacro(generateButtonPress(   "x", 180, 1480, 1));
+
+		// Select Map
+		this.concatToMacro(generateButtonPress("left", 180,  240, 1));
+		this.concatToMacro(generateButtonPress("down", 180,  240, 1));
+
+		// Recenter at Nursery
+		this.concatToMacro(generateButtonPress(   "a", 180, 2400, 3));
+	}
+
+	PickUpEgg() {
+		// Get Off Bike
+		this.concatToMacro(generateButtonPress("plus", 120, 360, 1));
+
+		// Walk towards breeder
+		this.concatToMacro(generateJoystickPush("left", 3000, 240, 100, 270));
+
+		// Rotate to breeder
+		this.concatToMacro(generateJoystickPush("left",  500, 120, 100, 180));
+
+		// Dialogue up to select pokemon to swap
+		this.concatToMacro(generateButtonPress(   "a", 1000, 120, 5));
+
+		// Select just hatched pokemon
+		this.concatToMacro(generateButtonPress("down",  240, 120, 1));
+
+		// Finish dialogue
+		this.concatToMacro(generateButtonPress(   "a", 1000, 120, 3));
+	}
+
+	build() {
+		if(!this.jsonManager.loadConcluded) return null;
+
+		this.macroJSON = []; // Clear Macro JSON
+
+		let count = 0;
+
+		while(count < this.parameters.eggsInBox) {
+			this.concatToMacro(this.getMacro("OpenBox"));
+
+			// Hatch Egg
+			this.HatchSegment();
+
+			// Go back to the Nursery
+			this.BackToNursery();
+
+			// Pick Up Egg
+			this.PickUpEgg();
 
 			// Select the PC
 			this.concatToMacro(generateButtonPress(    "x", 180,  840, 1));

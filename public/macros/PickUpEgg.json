@@ -1,0 +1,32 @@
+[
+    {
+        "name": "Pick Up Egg",
+        "macro": [
+            {
+                "button"  : "a",
+                "onTime"  : 120,
+                "offTime" : 420,
+                "count"   : 1
+            },
+            {
+                "button"  : "a",
+                "onTime"  : 120,
+                "offTime" : 840,
+                "count"   : 4
+            },
+            {
+                "button"  : "down",
+                "onTime"  : 120,
+                "offTime" : 240,
+                "count"   : 1
+            },
+            {
+                "button"  : "a",
+                "onTime"  : 120,
+                "offTime" : 840,
+                "count"   : 3
+            }
+        ],
+        "count" : 1
+    }
+]
