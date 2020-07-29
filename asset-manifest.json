@@ -1,22 +1,24 @@
 {
   "files": {
-    "main.css": "/PokemonMacrosJoyConDroid/static/css/main.acbdd099.chunk.css",
-    "main.js": "/PokemonMacrosJoyConDroid/static/js/main.5d44f6e4.chunk.js",
-    "main.js.map": "/PokemonMacrosJoyConDroid/static/js/main.5d44f6e4.chunk.js.map",
-    "runtime-main.js": "/PokemonMacrosJoyConDroid/static/js/runtime-main.ad906206.js",
-    "runtime-main.js.map": "/PokemonMacrosJoyConDroid/static/js/runtime-main.ad906206.js.map",
-    "static/js/2.0ac95d66.chunk.js": "/PokemonMacrosJoyConDroid/static/js/2.0ac95d66.chunk.js",
-    "static/js/2.0ac95d66.chunk.js.map": "/PokemonMacrosJoyConDroid/static/js/2.0ac95d66.chunk.js.map",
+    "main.css": "/PokemonMacrosJoyConDroid/static/css/main.c1bb6ff4.chunk.css",
+    "main.js": "/PokemonMacrosJoyConDroid/static/js/main.b9152b71.chunk.js",
+    "main.js.map": "/PokemonMacrosJoyConDroid/static/js/main.b9152b71.chunk.js.map",
+    "runtime-main.js": "/PokemonMacrosJoyConDroid/static/js/runtime-main.133016bd.js",
+    "runtime-main.js.map": "/PokemonMacrosJoyConDroid/static/js/runtime-main.133016bd.js.map",
+    "static/js/2.bd72b41a.chunk.js": "/PokemonMacrosJoyConDroid/static/js/2.bd72b41a.chunk.js",
+    "static/js/2.bd72b41a.chunk.js.map": "/PokemonMacrosJoyConDroid/static/js/2.bd72b41a.chunk.js.map",
     "index.html": "/PokemonMacrosJoyConDroid/index.html",
-    "precache-manifest.d3fd4a8819971d4fa0e2a0784f0f0507.js": "/PokemonMacrosJoyConDroid/precache-manifest.d3fd4a8819971d4fa0e2a0784f0f0507.js",
+    "precache-manifest.5bfc3fa20afdad3cb29fee79a628dc99.js": "/PokemonMacrosJoyConDroid/precache-manifest.5bfc3fa20afdad3cb29fee79a628dc99.js",
     "service-worker.js": "/PokemonMacrosJoyConDroid/service-worker.js",
-    "static/css/main.acbdd099.chunk.css.map": "/PokemonMacrosJoyConDroid/static/css/main.acbdd099.chunk.css.map",
-    "static/js/2.0ac95d66.chunk.js.LICENSE": "/PokemonMacrosJoyConDroid/static/js/2.0ac95d66.chunk.js.LICENSE"
+    "static/css/main.c1bb6ff4.chunk.css.map": "/PokemonMacrosJoyConDroid/static/css/main.c1bb6ff4.chunk.css.map",
+    "static/js/2.bd72b41a.chunk.js.LICENSE.txt": "/PokemonMacrosJoyConDroid/static/js/2.bd72b41a.chunk.js.LICENSE.txt",
+    "static/media/App.css": "/PokemonMacrosJoyConDroid/static/media/background.0d2122e7.png",
+    "static/media/click.mp3": "/PokemonMacrosJoyConDroid/static/media/click.a99ad0ce.mp3"
   },
   "entrypoints": [
-    "static/js/runtime-main.ad906206.js",
-    "static/js/2.0ac95d66.chunk.js",
-    "static/css/main.acbdd099.chunk.css",
-    "static/js/main.5d44f6e4.chunk.js"
+    "static/js/runtime-main.133016bd.js",
+    "static/js/2.bd72b41a.chunk.js",
+    "static/css/main.c1bb6ff4.chunk.css",
+    "static/js/main.b9152b71.chunk.js"
   ]
 }

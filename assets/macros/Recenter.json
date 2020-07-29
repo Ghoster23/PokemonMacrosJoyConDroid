@@ -1,0 +1,26 @@
+[
+		{
+				"name": "Recenter",
+				"macro": [
+						{
+								"button"  : "left",
+								"onTime"  : 180,
+								"offTime" : 240,
+								"count"   : 1
+						},
+						{
+								"button"  : "down",
+								"onTime"  : 180,
+								"offTime" : 240,
+								"count"   : 1
+						},
+						{
+								"button"  : "a",
+								"onTime"  : 180,
+								"offTime" : 2400,
+								"count"   : 3
+						}
+				],
+				"count": 1
+		}
+]
